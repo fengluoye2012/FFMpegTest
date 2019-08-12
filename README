@@ -1,0 +1,20 @@
+主要分为两部分
+一、NDK、JNI部分熟悉Java和C++通信，eg:java调用C++，C++调用Java等；
+
+Android 中Java和C、C++通信主要有两种方式
+1）通过Java+全类名+方法名,同时.变成/;
+2）通过动态注册，这种比较灵活，常用，Android系统也是通过这种方式；
+
+1）、JNIEnv参数解析：https://www.cnblogs.com/lenve/p/4781605.html?utm_source=tuicool&utm_medium=referral
+JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接口指针提供的各种函数来使用虚拟机的功能。JNIEnv是一个指向线程-局部数据的指针，而线程-局部数据中包含指向线程表的指针。
+实现原生方法的函数将JNIEnv接口指针作为它们的第一个参数。
+
+原生代码是C以及原生代码是C++其调用JNI函数的语法不同，C代码中，JNIEnv是指向JNINativeInterface结构的指针，为了访问任何一个JNI函数，该指针需要首先被解引用。
+在C++代码中，JNIEnv实际上是C++类实例，JNI函数以成员函数形式存在，因为JNI方法已经访问了当前的JNI环境
+
+2）C++ 字符串处理：https://blog.csdn.net/u013834525/article/details/82533935
+
+1）Java访问C++，包含有参，无参，有返回值等各种情况；
+
+
+二、FFmpeg的编译和在Android的应用；
