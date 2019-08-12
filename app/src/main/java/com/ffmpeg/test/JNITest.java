@@ -23,10 +23,9 @@ public class JNITest {
     public native String converStrFormJNI(String string);
 
     //C、C++ 调用Java方法；
-    public native void callJavaMethod(String[] strings);
+    public native void callJavaMethod();
 
-    public String printLog(String str) {
-        Log.e(TAG, str);
-        return "测试";
+    public void printLog() {
+        Log.e(TAG, "输出。。。。");
     }
 }

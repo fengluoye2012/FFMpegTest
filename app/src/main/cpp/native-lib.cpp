@@ -61,10 +61,29 @@ Java_com_ffmpeg_test_JNITest_converStrFormJNI(JNIEnv *env, jobject instance, jst
 }
 
 
+/**
+ * C++ 调用Java的方法
+ * 1）C++ 主动调用Java的方法
+ * 2）Java调用C++的方法，然后C++ 在调用Java的方法；
+ */
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_ffmpeg_test_JNITest_callJavaMethod(JNIEnv *env, jobject instance, jobjectArray strings) {
+Java_com_ffmpeg_test_JNITest_callJavaMethod(JNIEnv *env, jobject instance) {
 
-    //env->CallObjectMethod(instance,)
+    //获取jclass对象；
+    jclass cls = env->GetObjectClass(instance);
+    //通过全类名获取jclass对象；
+    //jclass cls = env->FindClass("com/ffmpeg/test/JNITest");
+
+    /**
+     * jclass clazz:
+     * const char* name:方法名
+     * const char* sig：方法签名
+     */
+    jmethodID methodId = env->GetMethodID(cls, "printLog",
+                                          "()V");
+
+    //调用无返回值方法
+    env->CallVoidMethod(instance, methodId);
 
 }

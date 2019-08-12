@@ -18,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
         TextView tv = findViewById(R.id.sample_text);
         TextView convertStr = findViewById(R.id.convert_str);
         tv.setText(JNITest.getInstance().stringFromJNI());
+        String[] str = new String[]{"1", "2"};
+        JNITest.getInstance().callJavaMethod();
 
         convertStr.setText(JNITest.getInstance().converStrFormJNI("fengluoye"));
     }
