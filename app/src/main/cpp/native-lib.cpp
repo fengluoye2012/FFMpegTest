@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <string>
+#include "android/log.h"
 
 using namespace std;
 using std::string;
@@ -70,6 +71,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_ffmpeg_test_JNITest_callJavaMethod(JNIEnv *env, jobject instance) {
 
+    //1） 调用无参无返回值方法；
     //获取jclass对象；
     jclass cls = env->GetObjectClass(instance);
     //通过全类名获取jclass对象；
@@ -82,8 +84,26 @@ Java_com_ffmpeg_test_JNITest_callJavaMethod(JNIEnv *env, jobject instance) {
      */
     jmethodID methodId = env->GetMethodID(cls, "printLog",
                                           "()V");
-
     //调用无返回值方法
     env->CallVoidMethod(instance, methodId);
 
+    //调用有参方法
+    jmethodID methodID = env->GetMethodID(cls, "printLog",
+                                          "(Ljava/lang/String;)V");
+    string str = string("fengluoye");
+    jstring jstr = env->NewStringUTF(str.c_str());
+    env->CallVoidMethod(instance, methodID, jstr);
+
+    //调用有参有返回值的方法 返回值为int
+    jmethodID jmethodID1 = env->GetMethodID(cls, "printLogStr", "(Ljava/lang/String;)I");
+    //调用有参有返回值的方法
+    jint jint1 = env->CallIntMethod(instance, jmethodID1, jstr);
+
+    //调用有参有返回值的方法,返回值是String对象；
+    jmethodID jmethodID2 = env->GetMethodID(cls, "printLogS",
+                                            "(Ljava/lang/String;)Ljava/lang/String;");
+    jobject jobj = env->CallObjectMethod(instance, jmethodID2, jstr);
+
+    //NDK 打印log
+    __android_log_print(ANDROID_LOG_ERROR, "JNITAG", "%s", str.c_str());
 }

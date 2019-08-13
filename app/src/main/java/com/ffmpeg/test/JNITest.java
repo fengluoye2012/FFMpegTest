@@ -28,4 +28,18 @@ public class JNITest {
     public void printLog() {
         Log.e(TAG, "输出。。。。");
     }
+
+    public void printLog(String str) {
+        Log.e(TAG, str);
+    }
+
+    public int printLogStr(String str) {
+        Log.e(TAG, "输出");
+        return 0;
+    }
+
+    public String printLogS(String str){
+        Log.e(TAG,str);
+        return "ceshi";
+    }
 }
