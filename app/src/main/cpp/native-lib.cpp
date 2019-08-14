@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <string>
 #include "android/log.h"
+#include "LogUtils.h"
 
 using namespace std;
 using std::string;
@@ -68,7 +69,7 @@ Java_com_ffmpeg_test_JNITest_converStrFormJNI(JNIEnv *env, jobject instance, jst
  * 2）Java调用C++的方法，然后C++ 在调用Java的方法；
  */
 extern "C"
-JNIEXPORT void JNICALL
+JNIEXPORT void
 Java_com_ffmpeg_test_JNITest_callJavaMethod(JNIEnv *env, jobject instance) {
 
     //1） 调用无参无返回值方法；
@@ -106,4 +107,9 @@ Java_com_ffmpeg_test_JNITest_callJavaMethod(JNIEnv *env, jobject instance) {
 
     //NDK 打印log
     __android_log_print(ANDROID_LOG_ERROR, "JNITAG", "%s", str.c_str());
+
+    LogUtils logUtils = LogUtils();
+    logUtils.logInfo(str);
+
+    logUtils.logWarn(str);
 }
