@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
         // Example of a call to a native method
         TextView tv = findViewById(R.id.sample_text);
         TextView convertStr = findViewById(R.id.convert_str);
+        TextView textView = findViewById(R.id.textView);
         tv.setText(JNITest.getInstance().stringFromJNI());
         String[] str = new String[]{"1", "2"};
         JNITest.getInstance().setJavaStaticFile();
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         JNITest.getInstance().callJavaMethod();
 
         convertStr.setText(JNITest.getInstance().converStrFormJNI("fengluoye"));
+        textView.setText(JNIDynamicUtils.getHelloWorldFormDynamicJNI());
     }
 
 

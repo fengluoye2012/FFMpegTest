@@ -29,8 +29,9 @@ extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_ffmpeg_test_JNITest_converStrFormJNI(JNIEnv *env, jobject instance, jstring str) {
 
-    //将jstring 类型转换为 char* 类型
-    const char *string_char = env->GetStringUTFChars(str, 0);
+
+    //将jstring 类型转换为 char* 类型  0 代表false,JNI_FALSE;s
+    const char *string_char = env->GetStringUTFChars(str, JNI_FALSE);
 
     //1)实现字符串拼接
     //将char* 转成字符串；
