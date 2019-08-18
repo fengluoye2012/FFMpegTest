@@ -6,7 +6,7 @@ public class JNITest {
     private int age;
     public static String name;
 
-    private String TAG = JNITest.class.getSimpleName();
+    private static String TAG = JNITest.class.getSimpleName();
 
     static {
         System.loadLibrary("native-lib");
@@ -50,5 +50,10 @@ public class JNITest {
 
     public int getAge() {
         return age;
+    }
+
+    public static String staticPrint(String str) {
+        Log.e(TAG, "静态方法被调用：：" + str);
+        return "静态方法被调用";
     }
 }

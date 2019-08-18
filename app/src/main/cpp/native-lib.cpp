@@ -108,24 +108,33 @@ Java_com_ffmpeg_test_JNITest_callJavaMethod(JNIEnv *env, jobject instance) {
     //调用无返回值方法
     env->CallVoidMethod(instance, methodId);
 
-    //调用有参方法
+    //2）调用有参方法
     jmethodID methodID = env->GetMethodID(cls, "printLog",
                                           "(Ljava/lang/String;)V");
     string str = string("fengluoye");
     jstring jstr = env->NewStringUTF(str.c_str());
     env->CallVoidMethod(instance, methodID, jstr);
 
-    //调用有参有返回值的方法 返回值为int
+    //3）调用有参有返回值的方法 返回值为int
     jmethodID jmethodID1 = env->GetMethodID(cls, "printLogStr", "(Ljava/lang/String;)I");
     //调用有参有返回值的方法
     jint jint1 = env->CallIntMethod(instance, jmethodID1, jstr);
+    LogUtils::logInfo("返回值：：" + jint1);
 
-    //调用有参有返回值的方法,返回值是String对象；
+    //4）调用有参有返回值的方法,返回值是String对象；
     jmethodID jmethodID2 = env->GetMethodID(cls, "printLogS",
                                             "(Ljava/lang/String;)Ljava/lang/String;");
     jobject jobj = env->CallObjectMethod(instance, jmethodID2, jstr);
+    const char *return_str = env->GetStringUTFChars(static_cast<jstring>(jobj), 0);
+    LogUtils::logInfo(string("返回值：：") + string(return_str));
 
-    //调用静态方法
-    LogUtils::logInfo(str);
-    LogUtils::logWarn(str);
+    //5）调用静态方法
+    jmethodID static_method_id = env->GetStaticMethodID(cls, "staticPrint",
+                                                        "(Ljava/lang/String;)Ljava/lang/String;");
+    //string str_param = string("静态方法参数");
+    jstring str_param = env->NewStringUTF("静态方法参数");
+    jobject obj_static = env->CallStaticObjectMethod(cls, static_method_id, str_param);
+    //类型强转，将jobject类型转换为jstring;
+    const char *str_static = env->GetStringUTFChars(static_cast<jstring>(obj_static), 0);
+    LogUtils::logInfo(str_static);
 }
