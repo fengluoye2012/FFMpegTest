@@ -62,6 +62,13 @@ Java_com_ffmpeg_test_JNITest_converStrFormJNI(JNIEnv *env, jobject instance, jst
     return env->NewStringUTF(after_name);
 }
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_ffmpeg_test_JNITest_setJavaStaticFile(JNIEnv *env, jobject instance) {
+
+    // TODO
+
+}
 
 /**
  * C++ 调用Java的方法
@@ -108,8 +115,7 @@ Java_com_ffmpeg_test_JNITest_callJavaMethod(JNIEnv *env, jobject instance) {
     //NDK 打印log
     __android_log_print(ANDROID_LOG_ERROR, "JNITAG", "%s", str.c_str());
 
-    LogUtils logUtils = LogUtils();
-    logUtils.logInfo(str);
-
-    logUtils.logWarn(str);
+    //调用静态方法
+    LogUtils::logInfo(str);
+    LogUtils::logWarn(str);
 }

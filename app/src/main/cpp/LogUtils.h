@@ -14,9 +14,16 @@ using std::string;
 
 class LogUtils {
 public:
+
+
     static void logInfo(string str);
 
     static void logWarn(string str);
+
+    static void logError(string str);
+
+    static void logDebug(string str);
+
 };
 
 

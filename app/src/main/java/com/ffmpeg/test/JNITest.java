@@ -22,6 +22,9 @@ public class JNITest {
     //实现Java和C/C++ 字符串拼接
     public native String converStrFormJNI(String string);
 
+    //修改Java静态变量的值
+    public native void setJavaStaticFile();
+
     //C、C++ 调用Java方法；
     public native void callJavaMethod();
 
@@ -38,8 +41,8 @@ public class JNITest {
         return 0;
     }
 
-    public String printLogS(String str){
-        Log.e(TAG,str);
+    public String printLogS(String str) {
+        Log.e(TAG, str);
         return "ceshi";
     }
 }

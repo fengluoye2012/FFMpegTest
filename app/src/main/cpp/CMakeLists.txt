@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-# 将.cpp文件配置在CMakeLists.txt中
+# 将.cpp文件配置在CMakeLists.txt中，如果是在子目录下，
 file(GLOB native_srcs "*.cpp")
 
 # Creates and names a library, sets it as either STATIC
@@ -20,7 +20,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-#        native-lib.cpp
+        #native-lib.cpp
         ${native_srcs}
         )
 
