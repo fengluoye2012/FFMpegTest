@@ -27,8 +27,13 @@ public class JNIDynamicUtils {
 
     public native String callJavaStaticMethod();
 
+
     public void printStatic() {
         Log.e(TAG, "动态注册JNI 调用静态方法:::");
+    }
+
+    public static void print_static(String str) {
+        Log.e(TAG, "静态注册：：" + str);
     }
 }
 

@@ -8,6 +8,7 @@
 
 #include "jni.h"
 #include "string"
+#include "android/log.h"
 
 using namespace std;
 using std::string;
@@ -22,12 +23,23 @@ jstring native_call_static_method(JNIEnv *env, jobject jobj) {
 
     jclass cls = env->GetObjectClass(jobj);
 
+    //1)动态注册调用Java方法
     jmethodID methodId = env->GetMethodID(cls, "printStatic", "()V");
+    env->CallVoidMethod(jobj, methodId);
 
-    env->CallVoidMethod(jobj,methodId);
+    //2）动态注册调用Java静态方法
+    jmethodID method_id_static = env->GetStaticMethodID(cls, "print_static",
+                                                        "(Ljava/lang/String;)V");
+
+    string str = string("静态方法调用");
+    jstring jstr = env->NewStringUTF(str.c_str());
+    env->CallStaticVoidMethod(cls, method_id_static, jstr);
+
+    //__android_log_print(ANDROID_LOG_INFO, "DY", "%s", "fengluoye");
 
     return env->NewStringUTF("动态");
 }
+
 
 /**
  * 动态注册，每增加一个native方法，需要在数组中增加一个JNINativeMethod结构体；
