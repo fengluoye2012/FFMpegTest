@@ -16,7 +16,8 @@ JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接�
 
 2）C++ 字符串处理：https://blog.csdn.net/u013834525/article/details/82533935
 
-1）Java访问C++，包含有参，无参，有返回值等各种情况；
+3）Java访问C++，包含有参，无参，有返回值等各种情况；
 
+4）CMakeLists.txt配置：https://blog.csdn.net/u012528526/article/details/80647537
 
 二、FFmpeg的编译和在Android的应用；
