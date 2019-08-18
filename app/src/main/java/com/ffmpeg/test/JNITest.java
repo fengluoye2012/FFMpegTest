@@ -3,6 +3,8 @@ package com.ffmpeg.test;
 import android.util.Log;
 
 public class JNITest {
+    private int age;
+    public static String name;
 
     private String TAG = JNITest.class.getSimpleName();
 
@@ -44,5 +46,9 @@ public class JNITest {
     public String printLogS(String str) {
         Log.e(TAG, str);
         return "ceshi";
+    }
+
+    public int getAge() {
+        return age;
     }
 }

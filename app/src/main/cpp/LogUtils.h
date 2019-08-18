@@ -11,7 +11,7 @@
 using namespace std;
 using std::string;
 
-
+//NDK 打印log
 class LogUtils {
 public:
 

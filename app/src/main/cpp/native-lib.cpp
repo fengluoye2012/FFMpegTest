@@ -1,6 +1,5 @@
 #include <jni.h>
 #include <string>
-#include "android/log.h"
 #include "LogUtils.h"
 
 using namespace std;
@@ -66,8 +65,22 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_ffmpeg_test_JNITest_setJavaStaticFile(JNIEnv *env, jobject instance) {
 
-    // TODO
+    //1) 调用并给Java成员变量赋值；
+    jclass cls = env->GetObjectClass(instance);
+    /*
+     * jclass clazz：jclass 对象
+     * const char* name:变量名
+     * const char* sig：变量签名
+     */
+    jfieldID fieldId = env->GetFieldID(cls, "age", "I");
+    env->SetIntField(instance, fieldId, 10);
 
+    //2）调用Java static 变量；
+    jfieldID fileId_static = env->GetStaticFieldID(cls, "name", "Ljava/lang/String;");
+
+    //创建jstring 对象
+    jstring str = env->NewStringUTF("fengluo2012");
+    env->SetStaticObjectField(cls, fileId_static, str);
 }
 
 /**
@@ -76,7 +89,7 @@ Java_com_ffmpeg_test_JNITest_setJavaStaticFile(JNIEnv *env, jobject instance) {
  * 2）Java调用C++的方法，然后C++ 在调用Java的方法；
  */
 extern "C"
-JNIEXPORT void
+JNIEXPORT void JNICALL
 Java_com_ffmpeg_test_JNITest_callJavaMethod(JNIEnv *env, jobject instance) {
 
     //1） 调用无参无返回值方法；
@@ -111,9 +124,6 @@ Java_com_ffmpeg_test_JNITest_callJavaMethod(JNIEnv *env, jobject instance) {
     jmethodID jmethodID2 = env->GetMethodID(cls, "printLogS",
                                             "(Ljava/lang/String;)Ljava/lang/String;");
     jobject jobj = env->CallObjectMethod(instance, jmethodID2, jstr);
-
-    //NDK 打印log
-    __android_log_print(ANDROID_LOG_ERROR, "JNITAG", "%s", str.c_str());
 
     //调用静态方法
     LogUtils::logInfo(str);
