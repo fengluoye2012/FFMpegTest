@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         TextView convertStr = findViewById(R.id.convert_str);
         TextView textView = findViewById(R.id.textView);
         tv.setText(JNITest.getInstance().stringFromJNI());
-        String[] str = new String[]{"1", "2"};
+
         JNITest.getInstance().setJavaStaticFile();
         Log.e(TAG, "file int ::" + JNITest.getInstance().getAge());
         Log.e(TAG, "file static  name ::" + JNITest.name);
@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
         convertStr.setText(JNITest.getInstance().converStrFormJNI("fengluoye"));
         textView.setText(JNIDynamicUtils.getHelloWorldFormDynamicJNI());
+
+        Log.e(TAG, "动态：：" + JNIDynamicUtils.callJavaStaticMethod());
     }
 
 

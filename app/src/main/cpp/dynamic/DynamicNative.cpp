@@ -2,13 +2,32 @@
 // Created by 风落叶 on 2019-08-18.
 //
 
-//动态注册Native方法，相比于静态注册，更加灵活，通用；
+/**
+ * 动态注册Native方法，相比于静态注册，更加灵活，通用；
+ */
 
 #include "jni.h"
+#include "string"
+
+using namespace std;
+using std::string;
 
 //C++ 层代码
-jstring native_hello(JNIEnv *env, jclass cls) {
+jstring native_hello(JNIEnv *env, jobject cls) {
     return env->NewStringUTF("Dynamic Hello World");
+}
+
+//动态注册方法，调用Java静态方法；
+jstring native_call_static_method(JNIEnv *env, jobject instance) {
+
+//    jclass cls = env->GetObjectClass(instance);
+//
+//    string str = string("风落叶");
+//    jmethodID methodId = env->GetMethodID(cls, "printStatic", "()V");
+//    env->CallVoidMethod(cls, methodId);
+
+    return env->NewStringUTF("动态");
+
 }
 
 /**
@@ -17,10 +36,11 @@ jstring native_hello(JNIEnv *env, jclass cls) {
  *
  * const char* name; Java 中的函数名
  * const char* signature; Java函数签名，格式为(输入参数类型)返回值类型
- * void*       fnPtr; native函数名
+ * void* fnPtr; native函数名
  */
 static JNINativeMethod gMethods[] = {
-        {"getHelloWorldFormDynamicJNI", "()Ljava/lang/String;", (void *) native_hello}
+        {"getHelloWorldFormDynamicJNI", "()Ljava/lang/String;", (void *) native_hello},
+        {"callJavaStaticMethod",        "()Ljava/lang/String;", (void *) native_call_static_method}
 };
 
 //System.loadLibrary过程会自动调用JNI_OnLoad,在此动态注册；
