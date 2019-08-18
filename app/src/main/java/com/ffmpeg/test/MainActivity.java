@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         convertStr.setText(JNITest.getInstance().converStrFormJNI("fengluoye"));
         textView.setText(JNIDynamicUtils.getHelloWorldFormDynamicJNI());
 
-        Log.e(TAG, "动态：：" + JNIDynamicUtils.callJavaStaticMethod());
+        Log.e(TAG, "动态：：" + JNIDynamicUtils.getInstance().callJavaStaticMethod());
     }
 
 

@@ -10,10 +10,22 @@ public class JNIDynamicUtils {
         System.loadLibrary("dynamic-native-lib");
     }
 
+    private static JNIDynamicUtils instance;
+
+    public static JNIDynamicUtils getInstance() {
+        if (instance == null) {
+            synchronized (JNIDynamicUtils.class) {
+                if (instance == null) {
+                    instance = new JNIDynamicUtils();
+                }
+            }
+        }
+        return instance;
+    }
 
     public static native String getHelloWorldFormDynamicJNI();
 
-    public static native String callJavaStaticMethod();
+    public native String callJavaStaticMethod();
 
     public void printStatic() {
         Log.e(TAG, "动态注册JNI 调用静态方法:::");

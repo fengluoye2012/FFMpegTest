@@ -18,16 +18,15 @@ jstring native_hello(JNIEnv *env, jobject cls) {
 }
 
 //动态注册方法，调用Java静态方法；
-jstring native_call_static_method(JNIEnv *env, jobject instance) {
+jstring native_call_static_method(JNIEnv *env, jobject jobj) {
 
-//    jclass cls = env->GetObjectClass(instance);
-//
-//    string str = string("风落叶");
-//    jmethodID methodId = env->GetMethodID(cls, "printStatic", "()V");
-//    env->CallVoidMethod(cls, methodId);
+    jclass cls = env->GetObjectClass(jobj);
+
+    jmethodID methodId = env->GetMethodID(cls, "printStatic", "()V");
+
+    env->CallVoidMethod(jobj,methodId);
 
     return env->NewStringUTF("动态");
-
 }
 
 /**
