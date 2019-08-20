@@ -92,6 +92,7 @@ jstring native_call_static_method(JNIEnv *env, jobject jobj) {
                                                         "(Ljava/lang/String;)V");
 
     string str = string("静态方法调用");
+    //创建字符串
     jstring jstr = env->NewStringUTF(str.c_str());
     env->CallStaticVoidMethod(cls, method_id_static, jstr);
 
