@@ -19,7 +19,9 @@ JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接�
 
 3）Java访问C++，包含有参，无参，有返回值等各种情况；
 
-4）CMakeLists.txt配置：https://blog.csdn.net/u012528526/article/details/80647537
+4）CMakeLists.txt配置：
+   1)https://blog.csdn.net/u012528526/article/details/80647537
+   2)https://blog.csdn.net/afei__/article/details/81201039
 
 5)实现秒表的功能
   1）C、C++和Java相互调用；
@@ -29,6 +31,7 @@ JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接�
   4）每个进程都有一个JavaVM，统一进程内，所有的线程共用一个JavaVM;
   5）jobject、jclass、jmethodID这些类型无法在线程间共享，需要转换为全局变量。
      在JNI接口线程中将jobject转换为全局变量，在子线程通过JavaVM*获取JNIEnv*，并通过全局变量jobect获取jclass，从而得到jmethod。
+
 
 
 二、FFmpeg的编译和在Android的应用；

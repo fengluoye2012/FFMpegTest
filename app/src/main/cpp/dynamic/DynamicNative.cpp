@@ -72,9 +72,10 @@ void *thread_01(const string name) {
     }
 
 
+//    javaVM->DetachCurrentThread();
     //删除全局引用；
-    jniEnv->DeleteGlobalRef(obj);
-    javaVM->DetachCurrentThread();
+    //jniEnv->DeleteGlobalRef(obj);
+
 
 }
 
@@ -124,7 +125,7 @@ void *thread_callback(void *cha) {
 
 
     //删除全局引用；
-    jniEnv->DeleteGlobalRef(obj);
+    //jniEnv->DeleteGlobalRef(obj);
     if (isAttached) {
         javaVM->DetachCurrentThread();
     }
