@@ -21,4 +21,13 @@ JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接�
 
 4）CMakeLists.txt配置：https://blog.csdn.net/u012528526/article/details/80647537
 
+5)实现秒表的功能
+  1）C、C++和Java相互调用；
+  2）由于秒表可以长时间计时，主线程无法做耗时操作，只能通过C、C++子线程去调用；创建线程的方法thread;
+  3） JNIEnv 不能跨线程传递，可以通过AttachCurrentThread()、DetachCurrentThread()方法;
+  4）每个进程都有一个JavaVM，统一进程内，所有的线程共用一个JavaVM;
+  5）jobject、jclass、jmethodID这些类型无法在线程间共享，需要转换为全局变量。
+     在JNI接口线程中将jobject转换为全局变量，在子线程通过JavaVM*获取JNIEnv*，并通过全局变量jobect获取jclass，从而得到jmethod。
+
+
 二、FFmpeg的编译和在Android的应用；

@@ -36,6 +36,7 @@ add_library( # Sets the name of the library.  设置库的名称，也就是生�
 add_library(
         dynamic-native-lib
         SHARED
+
         ${native_srcs_dy}
 )
 
@@ -67,6 +68,17 @@ target_link_libraries( # Specifies the target library.
         #一种是SHARED,一般来说就是我们需要生成的so文件
         #二种是STATIC IMPORTED 添加的第三方静态库
         native-lib
+
+        # Links the target library to the log library
+        # included in the NDK.
+        #链接本地NDK里面的库
+        ${log-lib})
+
+#dynamic-native-lib 链接日志库
+target_link_libraries( # Specifies the target library.
+        #通过add_library添加的直接写设置的名字，
+        #一种是SHARED,一般来说就是我们需要生成的so文件
+        #二种是STATIC IMPORTED 添加的第三方静态库
         dynamic-native-lib
 
         # Links the target library to the log library
