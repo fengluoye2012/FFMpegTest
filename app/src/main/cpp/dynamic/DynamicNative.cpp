@@ -12,7 +12,6 @@
 #include "string"
 #include "android/log.h"
 #include "thread"
-#include "pthread.h"
 
 using namespace std;
 using std::string;
@@ -40,7 +39,8 @@ void callJavaMethod(JNIEnv *env, jobject obj, jmethodID methodId) {
     env->CallVoidMethod(obj, methodId);
 }
 
-void *thread_01(const string& name) {
+//目前子线程报 Fatal signal 5 (SIGTRAP), code 1 (TRAP_BRKPT)
+void *thread_01(const string name) {
 
     JNIEnv *jniEnv = NULL;
     if (javaVM->AttachCurrentThread(&jniEnv, NULL) != JNI_OK) {
@@ -71,8 +71,91 @@ void *thread_01(const string& name) {
         //usleep(1000);//毫秒数
     }
 
+
     //删除全局引用；
-    //jniEnv->DeleteGlobalRef(obj);
+    jniEnv->DeleteGlobalRef(obj);
+    javaVM->DetachCurrentThread();
+
+}
+
+void *thread_callback(void *cha) {
+    char *name = (char *) cha;
+
+    //记录从jvm中申请JNIEnv*的状态
+    int status;
+    //用于标记线程的状态，用于开启，释放
+    bool isAttached = false;
+    JNIEnv *jniEnv = NULL;
+
+    //获取当前状态，查看是否已经拥有过JNIEnv指针
+    status = javaVM->GetEnv((void **) &jniEnv, JNI_VERSION_1_6);
+
+    if (status < 0) {
+        if (javaVM->AttachCurrentThread(&jniEnv, NULL) != JNI_OK) {
+            return NULL;
+        }
+        isAttached = true;
+    }
+
+
+    if (obj == NULL) {
+        return NULL;
+    }
+
+    jclass cls = jniEnv->GetObjectClass(obj);
+    if (cls == NULL) {
+        return NULL;
+    }
+
+    //1)动态注册调用Java方法
+    jmethodID methodId = jniEnv->GetMethodID(cls, "printStatic", "()V");
+
+    if (methodId == NULL) {
+        return NULL;
+    }
+
+    const int count = 10;
+    for (int i = 0; i < count; i++) {
+        LOGI("%s：：%d", name, i);
+        callJavaMethod(jniEnv, obj, methodId);
+        sleep(1);//秒数
+        //usleep(1000);//毫秒数
+    }
+
+
+    //删除全局引用；
+    jniEnv->DeleteGlobalRef(obj);
+    if (isAttached) {
+        javaVM->DetachCurrentThread();
+    }
+}
+
+void threadTest(JNIEnv *env, jobject jobj) {
+    //3)使用线程 并且给线程传参,通过pthread_create 启动的线程可以附加JNI AttachCurrentThread 或 AttachCurrentThreadAsDaemon 函数。
+    // 在附加之前，线程不包含任何 JNIEnv，也无法调用 JNI。
+    //JNIEnv 不能跨线程传递
+
+    string str = string("线程-2");
+    //3.1 thread 创建线程
+    thread thread1(thread_01, str);
+    //thread1.join();  //主线程等待子线程执行完成之后，再执行；
+    thread1.detach(); //子线程无需和主线程会合，各自执行；
+
+
+    //3.2 pthread_create创建线程 https://www.jianshu.com/p/986d608a8a35
+    //线程id
+    pthread_t tid;
+
+    char *cha = const_cast<char *>(str.c_str());
+    /*
+     * pthread_t *thread：表示创建的线程的id号
+     * const pthread_attr_t *attr：表示线程的属性设置
+     * void *(*start_routine) (void *)：很明显这是一个函数指针，表示线程创建后回调执行的函数
+     * void *arg：这个参数很简单，表示的就是函数指针回调执行函数的参数
+     */
+    pthread_create(&tid, NULL, thread_callback, cha);
+
+
 }
 
 //动态注册方法，调用Java静态方法；
@@ -98,13 +181,8 @@ jstring native_call_static_method(JNIEnv *env, jobject jobj) {
 
     LOGI("Android Version - %s", "静态方法被调用");
 
-    //3)使用线程 并且给线程传参,通过pthread_create 启动的线程可以附加JNI AttachCurrentThread 或 AttachCurrentThreadAsDaemon 函数。
-    // 在附加之前，线程不包含任何 JNIEnv，也无法调用 JNI。
-    //JNIEnv 不能跨线程传递
+    threadTest(env, jobj);
 
-    thread thread1(thread_01, string("线程-2"));
-    //thread1.join();  //主线程等待子线程执行完成之后，再执行；
-    thread1.detach(); //子线程无需和主线程会合，各自执行；
 
     return env->NewStringUTF("动态");
 }
