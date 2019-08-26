@@ -12,6 +12,8 @@
 #include "string"
 #include "android/log.h"
 #include "thread"
+#include "tgmath.h"
+
 
 using namespace std;
 using std::string;
@@ -33,6 +35,40 @@ static const char *kTAG = "DynamicNative";
 //C++ 层代码
 jstring native_hello(JNIEnv *env, jobject obj) {
     return env->NewStringUTF("Dynamic Hello World");
+}
+
+jstring native_convert(JNIEnv *env, jobject instance, jstring str) {
+    //将jstring 类型转换为 char* 类型  0 代表false,JNI_FALSE;s
+    const char *string_char = env->GetStringUTFChars(str, JNI_FALSE);
+
+    //1)实现字符串拼接
+    //将char* 转成字符串；
+    //string str_name = string(string_char);
+    string str_wel = string("欢迎回家：：");
+    //str_wel += string_char;
+    str_wel.append(string_char);
+
+    //2)实现字符串拼接
+    //字符串申明；
+    char name[] = "欢迎回家呼呼：：";
+    //在使用strcat拼接字符串时，将两个字符串拼接起来了，但是这导致内存操作错误，因为strcat只是将src加到了dest的后面，但是dest没有多余的容量来容纳这些数据；
+    //char *after = strcat(name, welcome);
+
+    //先申请足够容量的空间；
+    char *after = static_cast<char *>(malloc(strlen(name) + strlen(string_char)));
+    //将name内容拷贝到after;
+    strcpy(after, name);
+    //拼接字符串；
+    strcat(after, string_char);
+
+    env->ReleaseStringUTFChars(str, string_char);
+
+//    return env->NewStringUTF(after);
+
+    //将string 和 char* 相互转换;
+    const char *after_name = str_wel.c_str();
+    return env->NewStringUTF(after_name);
+
 }
 
 void callJavaMethod(JNIEnv *env, jobject obj, jmethodID methodId) {
@@ -76,7 +112,7 @@ void *thread_01(const string name) {
     //删除全局引用；
     //jniEnv->DeleteGlobalRef(obj);
 
-
+    return nullptr;
 }
 
 void *thread_callback(void *cha) {
@@ -129,6 +165,8 @@ void *thread_callback(void *cha) {
     if (isAttached) {
         javaVM->DetachCurrentThread();
     }
+
+    return nullptr;
 }
 
 void threadTest(JNIEnv *env, jobject jobj) {
@@ -182,7 +220,9 @@ jstring native_call_static_method(JNIEnv *env, jobject jobj) {
 
     LOGI("Android Version - %s", "静态方法被调用");
 
-    threadTest(env, jobj);
+    //threadTest(env, jobj);
+
+//    GetTicks();
 
 
     return env->NewStringUTF("动态");

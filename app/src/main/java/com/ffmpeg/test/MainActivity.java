@@ -20,14 +20,7 @@ public class MainActivity extends AppCompatActivity {
         TextView tv = findViewById(R.id.sample_text);
         TextView convertStr = findViewById(R.id.convert_str);
         TextView textView = findViewById(R.id.textView);
-        tv.setText(JNITest.getInstance().stringFromJNI());
 
-        JNITest.getInstance().setJavaStaticFile();
-        Log.e(TAG, "file int ::" + JNITest.getInstance().getAge());
-        Log.e(TAG, "file static  name ::" + JNITest.name);
-        JNITest.getInstance().callJavaMethod();
-
-        convertStr.setText(JNITest.getInstance().converStrFormJNI("fengluoye"));
         textView.setText(JNIDynamicUtils.getHelloWorldFormDynamicJNI());
 
         Log.e(TAG, "动态：：" + JNIDynamicUtils.getInstance().callJavaStaticMethod());

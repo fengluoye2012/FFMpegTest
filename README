@@ -32,6 +32,8 @@ JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接�
   5）jobject、jclass、jmethodID这些类型无法在线程间共享，需要转换为全局变量。
      在JNI接口线程中将jobject转换为全局变量，在子线程通过JavaVM*获取JNIEnv*，并通过全局变量jobect获取jclass，从而得到jmethod。
 
+6)如何管理第三方C、C++包
+
 
 
 二、FFmpeg的编译和在Android的应用；

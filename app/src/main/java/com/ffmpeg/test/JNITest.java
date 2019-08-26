@@ -9,7 +9,7 @@ public class JNITest {
     private static String TAG = JNITest.class.getSimpleName();
 
     static {
-        System.loadLibrary("native-lib");
+        //System.loadLibrary("native-lib");
     }
 
     private static JNITest instance = new JNITest();

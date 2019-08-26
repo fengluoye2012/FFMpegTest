@@ -12,6 +12,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags ""
+//                abiFilters "armeabi-v7a" //默认会生成四种架构的so库文件,也可制定
             }
         }
     }

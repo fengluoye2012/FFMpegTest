@@ -16,8 +16,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../jniLibs/${ANDROID_AB
 #设置生成so库的名称，并为源文件提供一个相对路径
 #设置统配符
 # 将.cpp文件配置在CMakeLists.txt中，如果是在子目录下，
-file(GLOB native_srcs "*.cpp")
-file(GLOB native_log "log/*.cpp")
 file(GLOB native_srcs_dy "dynamic/*.cpp")
 
 # Creates and names a library, sets it as either STATIC
@@ -25,26 +23,24 @@ file(GLOB native_srcs_dy "dynamic/*.cpp")
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
-add_library( # Sets the name of the library.  设置库的名称，也就是生成的so名称，在java代码中加载so库需要与此一致。
-        native-lib
-
-        # Sets the library as a shared library. 将library设置为一个共享库;STATIC:静态库，SHARED：生成动态库或共享库；
-        SHARED
-
-        # Provides a relative path to your source file(s).
-        # 为源文件提供一个相对路径,可以使用通配符，也可以一个一个文件的引入；
-        ${native_srcs} ${native_log}
-        )
+#add_library( # Sets the name of the library.  设置库的名称，也就是生成的so名称，在java代码中加载so库需要与此一致。
+#        native-lib
+#
+#        # Sets the library as a shared library. 将library设置为一个共享库;STATIC:静态库，SHARED：生成动态库或共享库；
+#        SHARED
+#
+#        # Provides a relative path to your source file(s).
+#        # 为源文件提供一个相对路径,可以使用通配符，也可以一个一个文件的引入；
+#        ${native_srcs}
+#        ${native_log})
 
 #
-
 add_library(
         dynamic-native-lib
 
         SHARED
 
-        ${native_srcs_dy} ${native_log}
-)
+        ${native_srcs_dy})
 
 
 # Searches for a specified prebuilt library and stores the path as a
@@ -65,23 +61,15 @@ find_library( # Sets the name of the path variable.
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
-#加载第三方库
-#todo
-
-#链接所有的库，比如上面我们添加的第三方库，添加的本地log库
-target_link_libraries( # Specifies the target library.
-        #目标库
-        native-lib
-
-        # Links the target library to the log library
-        # included in the NDK.
-        #目标库需要链接的库
-        ${log-lib})
+#加载第三方库 todo
+#只需要修改将两个libpng名称改成你需要的，可以随意取，该名称是后面用来链接使用的，再修改一下对应文件路径就ok。
 
 #dynamic-native-lib 链接日志库
 target_link_libraries( # Specifies the target library.
         #目标库
         dynamic-native-lib
 
+
         #目标库需要链接的库
+        android
         ${log-lib})
