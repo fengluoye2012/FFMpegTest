@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         TextView convertStr = findViewById(R.id.convert_str);
 
         textView.setText(JNIDynamicUtils.getHelloWorldFormDynamicJNI());
+        convertStr.setText(JNIDynamicUtils.getInstance().convertStringFormJNI("Hello"));
 
         Log.e(TAG, "动态：：" + JNIDynamicUtils.getInstance().callJavaStaticMethod());
     }

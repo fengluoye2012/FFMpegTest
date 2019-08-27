@@ -31,6 +31,8 @@ public class JNIDynamicUtils {
 
     public static native String getHelloWorldFormDynamicJNI();
 
+    public native String convertStringFormJNI(String str);
+
     public native String callJavaStaticMethod();
 
 

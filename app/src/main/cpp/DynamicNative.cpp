@@ -246,6 +246,7 @@ jstring native_call_static_method(JNIEnv *env, jobject jobj) {
  */
 static JNINativeMethod gMethods[] = {
         {"getHelloWorldFormDynamicJNI", "()Ljava/lang/String;", (void *) native_hello},
+        {"convertStringFormJNI", "(Ljava/lang/String;)Ljava/lang/String;", (void *) native_convert},
         {"callJavaStaticMethod",        "()Ljava/lang/String;", (void *) native_call_static_method}
 };
 
