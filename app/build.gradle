@@ -5,15 +5,18 @@ android {
     defaultConfig {
         applicationId "com.ffmpeg.test"
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
                 cppFlags ""
-//                abiFilters "armeabi-v7a" //默认会生成四种架构的so库文件,也可制定
             }
+        }
+
+        ndk {
+            abiFilters "armeabi-v7a" //默认会生成四种架构的so库文件,也可制定arm64-v8a, armeabi-v7a, x86, x86_64
         }
     }
 
@@ -24,9 +27,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
+    //根据path 路径不同，CMakeLists中引用的地址不同
     externalNativeBuild {
         cmake {
+            //path "CMakeLists.txt" //src/main/cpp/CMakeLists.txt
             path "src/main/cpp/CMakeLists.txt"
             version "3.10.2"
         }
@@ -34,7 +38,8 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDirs = ['jniLibs']
+            //jniLibs.srcDirs = ['jniLibs']
+            jniLibs.srcDirs = ['src/main/cpp']
         }
     }
 }

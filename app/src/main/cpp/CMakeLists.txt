@@ -11,12 +11,14 @@ PROJECT(FFmpegTest)
 
 # 设置生成的so动态库最后输出的路径，
 # set后面两个参数， 前面一个是命令，后面是路径。
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI})
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../jniLibs/${ANDROID_ABI})
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI})
+
 
 #设置生成so库的名称，并为源文件提供一个相对路径
 #设置统配符
 # 将.cpp文件配置在CMakeLists.txt中，如果是在子目录下，
-file(GLOB native_srcs_dy "dynamic/*.cpp")
+file(GLOB native_srcs_dy "*.cpp")
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -42,6 +44,53 @@ add_library(
 
         ${native_srcs_dy})
 
+#设置头文件目录
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
+# ffmpeg so库
+add_library(avcodec SHARED IMPORTED)
+set_target_properties(avcodec
+        PROPERTIES
+        IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/armeabi-v7a/libavcodec.so)
+
+add_library(avformat SHARED IMPORTED)
+set_target_properties(
+        avformat
+        PROPERTIES
+        IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/armeabi-v7a/libavformat.so)
+
+add_library(avfilter SHARED IMPORTED)
+set_target_properties(
+        avfilter
+        PROPERTIES
+        IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/armeabi-v7a/libavfilter.so)
+
+add_library(avutil SHARED IMPORTED)
+set_target_properties(
+        avutil
+        PROPERTIES
+        IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/armeabi-v7a/libavutil.so)
+
+add_library(swresample SHARED IMPORTED)
+set_target_properties(
+        swresample
+        PROPERTIES
+        IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/armeabi-v7a/libswresample.so)
+
+add_library(swscale SHARED IMPORTED)
+set_target_properties(
+        swscale
+        PROPERTIES
+        IMPORTED_LOCATION
+        ${CMAKE_SOURCE_DIR}/armeabi-v7a/libswscale.so)
+
+
+# ffmpeg  end
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -61,7 +110,7 @@ find_library( # Sets the name of the path variable.
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
-#加载第三方库 todo
+#加载第三方库
 #只需要修改将两个libpng名称改成你需要的，可以随意取，该名称是后面用来链接使用的，再修改一下对应文件路径就ok。
 
 #dynamic-native-lib 链接日志库
@@ -69,7 +118,13 @@ target_link_libraries( # Specifies the target library.
         #目标库
         dynamic-native-lib
 
-
         #目标库需要链接的库
+        avcodec
+        avformat
+        avfilter
+        avutil
+        swresample
+        swscale
+
         android
         ${log-lib})
