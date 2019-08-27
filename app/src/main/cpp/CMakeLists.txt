@@ -44,6 +44,7 @@ add_library(
 
         ${native_srcs_dy})
 
+#CMAKE_SOURCE_DIR 表示CMakeLists.txt所在文件的根目录，如当前的根目录是cpp文件夹；
 #设置头文件目录
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
