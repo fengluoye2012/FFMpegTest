@@ -17,9 +17,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Example of a call to a native method
-        TextView tv = findViewById(R.id.sample_text);
+        TextView textView = findViewById(R.id.sample_text);
         TextView convertStr = findViewById(R.id.convert_str);
-        TextView textView = findViewById(R.id.textView);
 
         textView.setText(JNIDynamicUtils.getHelloWorldFormDynamicJNI());
 

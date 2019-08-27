@@ -30,15 +30,15 @@ android {
     //根据path 路径不同，CMakeLists中引用的地址不同
     externalNativeBuild {
         cmake {
-            //path "CMakeLists.txt" //src/main/cpp/CMakeLists.txt
-            path "src/main/cpp/CMakeLists.txt"
+            path "CMakeLists.txt"
+            //path "src/main/cpp/CMakeLists.txt"
             version "3.10.2"
         }
     }
 
     sourceSets {
         main {
-            //jniLibs.srcDirs = ['jniLibs']
+//            jniLibs.srcDirs = ['jniLibs']
             jniLibs.srcDirs = ['src/main/cpp']
         }
     }
