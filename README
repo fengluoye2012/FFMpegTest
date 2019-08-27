@@ -40,3 +40,5 @@ JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接�
 1）Android 编译FFmpeg和NDK版本、FFmpeg的版本以及编译so的架构都有关系；
 具体参考https://codezjx.com/2019/06/21/compile-ffmpeg-android/
 或者将根目录下build_android.sh放入ffmpeg 目录下，执行
+
+2）视频转码并保存：https://blog.csdn.net/ethanco/article/details/83447554

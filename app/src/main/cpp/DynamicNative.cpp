@@ -235,6 +235,13 @@ jstring native_call_static_method(JNIEnv *env, jobject jobj) {
     return env->NewStringUTF("动态");
 }
 
+void native_videoDecode(JNIEnv *env, jobject jobj, jstring inPath, jstring outPath) {
+    const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
+    const char *out_path = env->GetStringUTFChars(outPath, JNI_FALSE);
+
+
+}
+
 
 /**
  * 动态注册，每增加一个native方法，需要在数组中增加一个JNINativeMethod结构体；
@@ -245,9 +252,10 @@ jstring native_call_static_method(JNIEnv *env, jobject jobj) {
  * void* fnPtr; native函数名
  */
 static JNINativeMethod gMethods[] = {
-        {"getHelloWorldFormDynamicJNI", "()Ljava/lang/String;", (void *) native_hello},
-        {"convertStringFormJNI", "(Ljava/lang/String;)Ljava/lang/String;", (void *) native_convert},
-        {"callJavaStaticMethod",        "()Ljava/lang/String;", (void *) native_call_static_method}
+        {"getHelloWorldFormDynamicJNI", "()Ljava/lang/String;",                    (void *) native_hello},
+        {"convertStringFormJNI",        "(Ljava/lang/String;)Ljava/lang/String;",  (void *) native_convert},
+        {"callJavaStaticMethod",        "()Ljava/lang/String;",                    (void *) native_call_static_method},
+        {"videoDecode",                 "(Ljava/lang/String;Ljava/lang/String;)V", (void *) native_videoDecode}
 };
 
 //System.loadLibrary过程会自动调用JNI_OnLoad,在此动态注册；

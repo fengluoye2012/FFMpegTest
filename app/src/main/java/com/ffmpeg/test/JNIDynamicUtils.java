@@ -43,5 +43,7 @@ public class JNIDynamicUtils {
     public static void print_static(String str) {
         Log.e(TAG, "静态注册：：" + str);
     }
+
+    public native void videoDecode(String inPath,String outPath);
 }
 
