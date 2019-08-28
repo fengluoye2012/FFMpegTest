@@ -20,7 +20,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDR
 #设置生成so库的名称，并为源文件提供一个相对路径
 #设置统配符
 # 将.cpp文件配置在CMakeLists.txt中，如果是在子目录下，
-file(GLOB native_srcs_dy "src/main/cpp/*.cpp")
+file(GLOB native_srcs_dy "${CMAKE_SOURCE_DIR}/src/main/cpp/*.cpp")
+file(GLOB ffmpeg_srcs "${CMAKE_SOURCE_DIR}/src/main/cpp/*.c")
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -44,7 +45,7 @@ add_library(
 
         SHARED
 
-        ${native_srcs_dy})
+        ${ffmpeg_srcs})
 
 # CMAKE_SOURCE_DIR CMAKE_SOURCE_DIR 表示CMakeLists.txt所在文件的根目录，如当前的根目录是app文件夹；
 #设置头文件目录
