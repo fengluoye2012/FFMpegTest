@@ -5,12 +5,12 @@
 # include <stdio.h>
 #include <jni.h>
 #include <libavformat/avformat.h>
-
 #include "VideoDecodeUtil.h"
 
 JNIEXPORT jstring JNICALL
 Java_com_ffmpeg_test_FFmpegTest_ffmpegConfig(JNIEnv *env, jclass type) {
     const char *str = avcodec_configuration();
+
     return (*env)->NewStringUTF(env, str);
 }
 

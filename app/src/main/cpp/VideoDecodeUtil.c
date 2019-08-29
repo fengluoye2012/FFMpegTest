@@ -9,15 +9,14 @@
 #include <libswscale/swscale.h>
 #include <libavutil/imgutils.h>
 #include "VideoDecodeUtil.h"
+#include "CLogUtil.h"
 
-
-#define LOGI(FORMAT, ...) __android_log_print(ANDROID_LOG_INFO,"heiko",FORMAT,__VA_ARGS__);
-#define LOGE(FORMAT, ...) __android_log_print(ANDROID_LOG_ERROR,"heiko",FORMAT,__VA_ARGS__);
-
+static const char *TAG = "VideoDecodeUtil";
 
 void videoDecode(const char *input, const char *output) {
 
-    LOGI("%s", "开始转码");
+
+    LOGI(TAG, "%s", "开始转码");
 
     //1 注册所有组件
     av_register_all();
@@ -29,7 +28,7 @@ void videoDecode(const char *input, const char *output) {
     int code = avformat_open_input(&avFormatContext, input, NULL, NULL);
 
     if (code < 0) {
-        LOGI("%s", "无法打开视频文件");
+        LOGI(TAG, "%s", "无法打开视频文件");
         return;
     }
 
@@ -52,16 +51,16 @@ void videoDecode(const char *input, const char *output) {
     }
 
     if (code < 0) {
-        LOGI("%s", "无法获取视频信息");
+        LOGI(TAG, "%s", "无法获取视频信息");
         return;
     }
 
     if (v_stream_index == -1) {
-        LOGI("%s", "找不到视频流")
+        LOGI(TAG, "%s", "找不到视频流")
         return;
     }
 
-    LOGI("找到了视频流::%d", v_stream_index);
+    LOGI(TAG, "找到了视频流::%d", v_stream_index);
 
     //只有知道视频的编码方式，才能够根据编码方式找到解码器
     AVCodecParameters *avCodecParameters = avFormatContext->streams[v_stream_index]->codecpar;
@@ -70,7 +69,7 @@ void videoDecode(const char *input, const char *output) {
     AVCodec *avCodec = avcodec_find_decoder(avCodecParameters->codec_id);
 
     if (avCodec == NULL) {
-        LOGI("%s", "找不到解码器");
+        LOGI(TAG, "%s", "找不到解码器");
         return;
     }
 
@@ -79,7 +78,7 @@ void videoDecode(const char *input, const char *output) {
 
     code = avcodec_parameters_to_context(avCodecContext, avCodecParameters);
     if (code < 0) {
-        LOGI("%s", "avcodec_parameters_to_context Fail")
+        LOGI(TAG, "%s", "avcodec_parameters_to_context Fail")
         return;
     }
 
@@ -87,7 +86,7 @@ void videoDecode(const char *input, const char *output) {
     code = avcodec_open2(avCodecContext, avCodec, NULL);
 
     if (code < 0) {
-        LOGI("%s", "解码器无法打开");
+        LOGI(TAG, "%s", "解码器无法打开");
         return;
     }
 
@@ -97,13 +96,13 @@ void videoDecode(const char *input, const char *output) {
     //输出视频信息
     int srcWidth = avCodecParameters->width;
     int srcHeight = avCodecParameters->height;
-    LOGI("视频文件格式：%d,%d", srcWidth, srcHeight);
+    LOGI(TAG, "视频文件格式：%d,%d", srcWidth, srcHeight);
 
 
-    LOGI("视频文件名：%s", avFormatContext->filename);
-    LOGI("视频文件格式：%s", avFormatContext->iformat->name);
-    LOGI("视频时长：%lld", dura / 1000000);
-    LOGI("解码器名称：%s", avCodec->name);
+    LOGI(TAG, "视频文件名：%s", avFormatContext->filename);
+    LOGI(TAG, "视频文件格式：%s", avFormatContext->iformat->name);
+    LOGI(TAG, "视频时长：%lld", dura / 1000000);
+    LOGI(TAG, "解码器名称：%s", avCodec->name);
 
     //准备读取
     //缓冲区，开辟空间 AVPacket用来存储一帧一帧的压缩数据（H264）
@@ -112,7 +111,7 @@ void videoDecode(const char *input, const char *output) {
 
     AVPacket *avPacket = av_packet_alloc();
     if (avPacket == NULL) {
-        LOGI("%s", "avPacket 不能为空")
+        LOGI(TAG, "%s", "avPacket 不能为空")
         return;
     }
 
@@ -146,7 +145,7 @@ void videoDecode(const char *input, const char *output) {
 
     //6 一帧一帧的读取压缩数据 成功返回0，否则小于0
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
-        LOGI("解码第%d帧", frame_count);
+        LOGI(TAG, "解码第%d帧", frame_count);
 
         //只压缩视频流数据（根据流的索引位置判断）
         if (avPacket->stream_index == v_stream_index) {
@@ -154,7 +153,7 @@ void videoDecode(const char *input, const char *output) {
             code = avcodec_send_packet(avCodecContext, avPacket);
             av_packet_unref(avPacket);
             if (code < 0) {
-                LOGI("%s :: %d", "avcodec_send_packet 失败", code);
+                LOGI(TAG, "%s :: %d", "avcodec_send_packet 失败", code);
             }
 
             //这个不能改成使用code 判断；
@@ -196,9 +195,8 @@ void videoDecode(const char *input, const char *output) {
     avcodec_free_context(&avCodecContext);
     avformat_free_context(avFormatContext);
 
-    LOGI("%s", "转码结束");
+    LOGI(TAG, "%s", "转码结束");
 }
 
 void decode() {
-
 }

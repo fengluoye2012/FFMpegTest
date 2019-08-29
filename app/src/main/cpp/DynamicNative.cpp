@@ -20,6 +20,7 @@ extern "C" {
 #include "include/libavformat/avformat.h"
 #include "include/libavutil/avutil.h"
 #include "VideoDecodeUtil.h"
+#include "CPlusLogUtil.h"
 }
 
 
@@ -32,17 +33,11 @@ jobject obj;
 // Android log function wrappers
 static const char *kTAG = "DynamicNative";
 
-#define LOGI(...) \
-  ((void)__android_log_print(ANDROID_LOG_INFO, kTAG, __VA_ARGS__))
-#define LOGW(...) \
-  ((void)__android_log_print(ANDROID_LOG_WARN, kTAG, __VA_ARGS__))
-#define LOGE(...) \
-  ((void)__android_log_print(ANDROID_LOG_ERROR, kTAG, __VA_ARGS__))
-
-
 //C++ 层代码
 jstring native_hello(JNIEnv *env, jobject obj) {
     string str = avcodec_configuration();
+    LOGE(kTAG, "C++  avcodec_configuration::%s", str.c_str());
+    LOGI("%s", str.c_str());
     return env->NewStringUTF(str.c_str());
 //    return env->NewStringUTF("Dynamic Hello World");
 }
