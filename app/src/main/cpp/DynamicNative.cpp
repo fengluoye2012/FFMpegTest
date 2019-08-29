@@ -241,43 +241,7 @@ void native_videoDecode(JNIEnv *env, jobject jobj, jstring inPath, jstring outPa
     const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
     const char *out_path = env->GetStringUTFChars(outPath, JNI_FALSE);
 
-//    av_register_all();
-//
-//    AVFormatContext *avFormatContext = avformat_alloc_context();
-//    //打开媒体文件,成功返回0；否则为负数；
-//    int code = avformat_open_input(&avFormatContext, in_path, NULL, NULL);
-//
-//    if (code < 0) {
-//        LOGI("%s", "无法打开视频文件");
-//        return;
-//    }
-//
-//    //获取文件信息
-//    code = avformat_find_stream_info(avFormatContext, NULL);
-//
-//    if (code < 0) {
-//        LOGI("%s", "无法获取视频信息");
-//        return;
-//    }
-//
-//
-//    //获取视频流的索引位置
-//    //遍历所有类型的流（音频流、视频流、字幕流），找到视频流
-//    int v_stream_index = -1;
-//    int i = 0;
-//    for (; i < avFormatContext->nb_streams; i++) {
-//        //流的类型  为视频流
-//        // if (avFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
-//        if (avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-//            v_stream_index = i;
-//            break;
-//        }
-//    }
-//
-//    if(v_stream_index == -1){
-//
-//        return;
-//    }
+
 }
 
 

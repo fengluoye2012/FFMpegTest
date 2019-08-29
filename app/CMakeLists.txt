@@ -45,6 +45,7 @@ add_library(
 
         SHARED
 
+        ${native_srcs_dy}
         ${ffmpeg_srcs})
 
 # CMAKE_SOURCE_DIR CMAKE_SOURCE_DIR 表示CMakeLists.txt所在文件的根目录，如当前的根目录是app文件夹；
