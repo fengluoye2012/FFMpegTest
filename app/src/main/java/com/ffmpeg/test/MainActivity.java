@@ -26,11 +26,14 @@ public class MainActivity extends AppCompatActivity {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FFmpegTest.videoDecode("/storage/emulated/0/DCIM/Camera/VID_20190828_174922.mp4", "/storage/emulated/0/DCIM/Camera/output_1280x720_yuv420p.yuv");
+                String inPath = "/storage/emulated/0/DCIM/Camera/VID_20190828_174922.mp4";
+                String outPath = "/storage/emulated/0/DCIM/Camera/output_1280x720_yuv420p.yuv";
+                //FFmpegTest.videoDecode(inPath, outPath);
+                JNIDynamicUtils.getInstance().videoDecode(inPath, outPath);
             }
         });
 
-        //jniFormCPlus();
+        jniFormCPlus();
 
         jniFormC();
     }

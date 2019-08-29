@@ -13,12 +13,13 @@
 #include "android/log.h"
 #include "thread"
 #include "tgmath.h"
+
+//引用C的头文件
+extern "C" {
+#include "include/libavcodec/avcodec.h"
 #include "include/libavformat/avformat.h"
 #include "include/libavutil/avutil.h"
-
-extern "C"
-{
-#include "include/libavcodec/avcodec.h"
+#include "VideoDecodeUtil.h"
 }
 
 
@@ -241,6 +242,7 @@ void native_videoDecode(JNIEnv *env, jobject jobj, jstring inPath, jstring outPa
     const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
     const char *out_path = env->GetStringUTFChars(outPath, JNI_FALSE);
 
+    videoDecode(in_path, out_path);
 
 }
 
