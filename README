@@ -42,3 +42,6 @@ JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接�
 或者将根目录下build_android.sh放入ffmpeg 目录下，执行
 
 2）视频转码并保存：https://blog.csdn.net/ethanco/article/details/83447554
+
+三、C、C++的区别
+1）C没有类的概念，也就没有public等访问修饰符，也没有继承等；C不允许使用默认参数，不定长度参数前必须有正常参数，

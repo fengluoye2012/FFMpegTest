@@ -10,11 +10,11 @@
 #include "stdio.h"
 #include "string.h"
 
-
-// 共同的Log日志
+//日志工具头文件
 #define LOGI(...) \
   __android_log_print(ANDROID_LOG_INFO, kTAG, __VA_ARGS__)
 #define LOGW(...) \
  __android_log_print(ANDROID_LOG_WARN, kTAG, __VA_ARGS__)
 #define LOGE(...) \
   __android_log_print(ANDROID_LOG_ERROR, kTAG, __VA_ARGS__)
+
