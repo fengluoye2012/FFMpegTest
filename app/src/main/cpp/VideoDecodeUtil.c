@@ -8,8 +8,10 @@
 #include <android/log.h>
 #include <libswscale/swscale.h>
 #include <libavutil/imgutils.h>
+#include <unistd.h>
 #include "VideoDecodeUtil.h"
 #include "CLogUtil.h"
+#include <android/native_window_jni.h>
 
 
 void videoDecode(const char *input, const char *output) {
@@ -36,7 +38,7 @@ void videoDecode(const char *input, const char *output) {
         return;
     }
 
-    prepareReadFrame();
+    prepareReadFrame(AV_PIX_FMT_YUV420P);
 
     decodeScale(output);
 
@@ -46,7 +48,7 @@ void videoDecode(const char *input, const char *output) {
     LOGI(TAG, "%s", "转码结束");
 }
 
-void videoPlay(const char *input) {
+void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface) {
     //1 注册所有组件
     ffmpegRegister();
 
@@ -67,11 +69,81 @@ void videoPlay(const char *input) {
         return;
     }
 
-    prepareReadFrame();
+    prepareReadFrame(AV_PIX_FMT_ABGR);
 
 
+
+    getANativeWindow(jniEnv, surface);
+
+    playReadFrame();
+
+
+    releaseResource();
 }
 
+void playReadFrame() {
+    while (av_read_frame(avFormatContext, avPacket) >= 0) {
+        if (avPacket->stream_index == v_stream_index) {
+
+            LOGI(TAG, "%s", "解码");
+            avcodec_send_packet(avCodecContext, avPacket);
+
+            if (code < 0) {
+                LOGI(TAG, "%s :: %d", "avcodec_send_packet 失败", code);
+            }
+
+            //这个不能改成使用code 判断；
+            while (1) {
+                code = avcodec_receive_frame(avCodecContext, avFrameYUV);
+                if (code < 0) {
+                    break;
+                }
+
+                //说明有内容
+                //绘制之前配置nativewindow
+                ANativeWindow_setBuffersGeometry(aNativeWindow, srcWidth, srcHeight,
+                                                 WINDOW_FORMAT_RGBA_8888);
+
+                //上锁
+                ANativeWindow_lock(aNativeWindow, &aNativeWindow_buffer, NULL);
+
+                //转换为rgb格式
+                sws_scale(sws_ctx, (const uint8_t *const *) avFrame->data, avFrame->linesize, 0,
+                          avFrame->height, avFrameYUV->data, avFrameYUV->linesize);
+
+                // rgb_frame是有画面数据
+                uint8_t *dst = (uint8_t *) aNativeWindow_buffer.bits;
+                //拿到一行有多少个字节 RGBA
+                int destStride = aNativeWindow_buffer.stride * 4;
+                //像素数据的首地址
+                uint8_t *src = avFrameYUV->data[0];
+                //实际内存一行数量
+                size_t srcStride = (size_t) avFrameYUV->linesize[0];
+                //int i=0;
+                for (int i = 0; i < avCodecContext->height; ++i) {
+                    //memcpy(void *dest, const void *src, size_t n)
+                    // 将rgb_frame中每一行的数据复制给nativewindow
+                    memcpy(dst + i * destStride, src + i * srcStride, srcStride);
+                }
+
+                //解锁
+                ANativeWindow_unlockAndPost(aNativeWindow);
+                usleep(1000 * 16);
+            }
+        }
+        av_packet_unref(avPacket);
+    }
+
+    ANativeWindow_release(aNativeWindow);
+}
+
+void getANativeWindow(JNIEnv *jniEnv, jobject surface) {
+    aNativeWindow = ANativeWindow_fromSurface(jniEnv, surface);
+    if (aNativeWindow == NULL) {
+        LOGE(TAG, "%s", "ANativeWindow 为null");
+        return;
+    }
+}
 
 void ffmpegRegister() {
     av_register_all();
@@ -180,7 +252,7 @@ bool openAvCodec() {
 }
 
 
-void prepareReadFrame() {
+void prepareReadFrame(enum AVPixelFormat aVPixelFormat) {
 //准备读取
     //缓冲区，开辟空间 AVPacket用来存储一帧一帧的压缩数据（H264）
 //    AVPacket *avPacket = (AVPacket *) av_malloc(sizeof(AVPacket));
@@ -202,22 +274,20 @@ void prepareReadFrame() {
     //只有指定了AVFrame的像素格式、画面大小才能真正分配内存
     //缓存区分配内存
     out_buffer = av_malloc(
-            (size_t) av_image_get_buffer_size(AV_PIX_FMT_YUV420P, srcWidth, srcHeight, 1));
+            (size_t) av_image_get_buffer_size(aVPixelFormat, srcWidth, srcHeight, 1));
 
 
     //初始化缓存区
-    av_image_fill_arrays(avFrameYUV->data, avFrameYUV->linesize, out_buffer, AV_PIX_FMT_YUV420P,
+    av_image_fill_arrays(avFrameYUV->data, avFrameYUV->linesize, out_buffer, aVPixelFormat,
                          srcWidth, srcHeight, 1);
-
-}
-
-void decodeScale(const char *output) {
 
     //用于转码 (缩放) 的参数，转之前的宽高，转之后的宽高，格式等
     sws_ctx = sws_getContext(srcWidth, srcWidth, avCodecContext->pix_fmt,
-                             srcWidth, srcWidth, AV_PIX_FMT_YUV420P, SWS_BICUBIC,
+                             srcWidth, srcWidth, aVPixelFormat, SWS_BICUBIC,
                              NULL, NULL, NULL);
+}
 
+void decodeScale(const char *output) {
     fp_yuv = fopen(output, "wb+");
 }
 
@@ -269,10 +339,13 @@ void readFrame() {
     }
 }
 
-
 void releaseResource() {
-    fclose(fp_yuv);
+    if(fp_yuv != NULL){
+        fclose(fp_yuv);
+    }
+
     av_frame_free(&avFrame);
+    av_frame_free(&avFrameYUV);
     avcodec_free_context(&avCodecContext);
     avformat_free_context(avFormatContext);
 }

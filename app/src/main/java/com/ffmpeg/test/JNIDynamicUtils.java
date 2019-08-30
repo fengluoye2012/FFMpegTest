@@ -1,6 +1,7 @@
 package com.ffmpeg.test;
 
 import android.util.Log;
+import android.view.Surface;
 
 public class JNIDynamicUtils {
 
@@ -44,6 +45,9 @@ public class JNIDynamicUtils {
         Log.e(TAG, "静态注册：：" + str);
     }
 
-    public native void videoDecode(String inPath,String outPath);
+    public native void videoDecode(String inPath, String outPath);
+
+
+    public native void playVideo(String inPath, Surface surface);
 }
 

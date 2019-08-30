@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = MainActivity.class.getSimpleName();
     private TextView textView;
     private TextView convertStr;
+    private VideoView videoView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
         // Example of a call to a native method
         textView = findViewById(R.id.sample_text);
         convertStr = findViewById(R.id.convert_str);
+        videoView = findViewById(R.id.videoView);
 
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
                 String outPath = "/storage/emulated/0/DCIM/Camera/output_1280x720_yuv420p.yuv";
                 //FFmpegTest.videoDecode(inPath, outPath);
                 JNIDynamicUtils.getInstance().videoDecode(inPath, outPath);
+                //videoView.play(inPath);
             }
         });
 

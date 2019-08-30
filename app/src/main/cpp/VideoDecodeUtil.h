@@ -7,6 +7,8 @@
 // 头文件的声明 https://blog.csdn.net/qq_41912125/article/details/82658046
 
 #include <stdbool.h>
+#include <jni.h>
+#include <android/native_window.h>
 
 #ifndef FFMPEGTEST_VIDEODECODEUTIL_H
 #define FFMPEGTEST_VIDEODECODEUTIL_H
@@ -43,6 +45,10 @@ struct SwsContext *sws_ctx;
 FILE *fp_yuv;
 
 
+ANativeWindow *aNativeWindow;
+//视频缓冲区
+ANativeWindow_Buffer aNativeWindow_buffer;
+
 /**
  * 将视频转码为YUV420
  * @param input
@@ -53,7 +59,7 @@ void videoDecode(const char *input, const char *output);
 /**
  * 使用FFmpeg 播放视频
  */
-void videoPlay(const char *input);
+void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface);
 
 /**
  * 初始化
@@ -89,7 +95,7 @@ bool openAvCodec();
  * 准备对去帧数据
  * @param output
  */
-void prepareReadFrame();
+void prepareReadFrame(enum AVPixelFormat aVPixelFormat);
 
 
 void decodeScale(const char *output);
@@ -103,3 +109,8 @@ void readFrame();
  * 释放资源
  */
 void releaseResource();
+
+
+void getANativeWindow(JNIEnv *jniEnv, jobject surface);
+
+void playReadFrame();

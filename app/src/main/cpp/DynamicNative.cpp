@@ -198,8 +198,6 @@ void threadTest(JNIEnv *env, jobject jobj) {
      * void *arg：这个参数很简单，表示的就是函数指针回调执行函数的参数
      */
     pthread_create(&tid, NULL, thread_callback, cha);
-
-
 }
 
 //动态注册方法，调用Java静态方法；
@@ -239,13 +237,19 @@ void native_videoDecode(JNIEnv *env, jobject jobj, jstring inPath, jstring outPa
 
     videoDecode(in_path, out_path);
 
-}
-
-
-void native_ffmpeg_play(JNIEnv *env, jobject jobj) {
+    // env->ReleaseStringChars()
 
 }
 
+/**
+ * 播放视频
+ * @param env
+ * @param jobj
+ */
+void native_ffmpeg_play(JNIEnv *env, jobject jobj, jstring inPath, jobject surface) {
+    const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
+    videoPlay(env, in_path, surface);
+}
 
 /**
  * 动态注册，每增加一个native方法，需要在数组中增加一个JNINativeMethod结构体；
@@ -256,10 +260,11 @@ void native_ffmpeg_play(JNIEnv *env, jobject jobj) {
  * void* fnPtr; native函数名
  */
 static JNINativeMethod gMethods[] = {
-        {"getHelloWorldFormDynamicJNI", "()Ljava/lang/String;",                    (void *) native_hello},
-        {"convertStringFormJNI",        "(Ljava/lang/String;)Ljava/lang/String;",  (void *) native_convert},
-        {"callJavaStaticMethod",        "()Ljava/lang/String;",                    (void *) native_call_static_method},
-        {"videoDecode",                 "(Ljava/lang/String;Ljava/lang/String;)V", (void *) native_videoDecode}
+        {"getHelloWorldFormDynamicJNI", "()Ljava/lang/String;",                        (void *) native_hello},
+        {"convertStringFormJNI",        "(Ljava/lang/String;)Ljava/lang/String;",      (void *) native_convert},
+        {"callJavaStaticMethod",        "()Ljava/lang/String;",                        (void *) native_call_static_method},
+        {"videoDecode",                 "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_videoDecode},
+        {"playVideo",                   "(Ljava/lang/String;Landroid/view/Surface;)V", (void *) native_ffmpeg_play}
 };
 
 //System.loadLibrary过程会自动调用JNI_OnLoad,在此动态注册；

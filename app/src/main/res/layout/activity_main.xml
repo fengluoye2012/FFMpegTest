@@ -23,4 +23,9 @@
         android:padding="5dp"
         android:text="Hello World!" />
 
+    <com.ffmpeg.test.VideoView
+        android:id="@+id/videoView"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
+
 </LinearLayout>
