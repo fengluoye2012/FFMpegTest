@@ -42,6 +42,15 @@ struct SwsContext *sws_ctx;
 
 FILE *fp_yuv;
 
+
+
+/**
+ * 将视频转码为YUV420
+ * @param input
+ * @param output
+ */
+void videoDecode(const char *input, const char *output);
+
 /**
  * 初始化
  */
@@ -87,10 +96,3 @@ void readFrame();
  * 释放资源
  */
 void releaseResource();
-
-/**
- * 将视频转码为YUV420
- * @param input
- * @param output
- */
-void videoDecode(const char *input, const char *output);

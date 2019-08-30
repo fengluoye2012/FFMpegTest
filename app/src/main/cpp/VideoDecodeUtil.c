@@ -11,6 +11,38 @@
 #include "VideoDecodeUtil.h"
 #include "CLogUtil.h"
 
+void videoDecode(const char *input, const char *output) {
+
+    LOGI(TAG, "%s", "开始转码");
+
+    //1 注册所有组件
+    ffmpegRegister();
+
+    if (!getStreamInfo(input)) {
+        return;
+    }
+
+    if (!getVideoIndex()) {
+        return;
+    }
+
+    if (!getAVCodec()) {
+        return;
+    }
+
+
+    if (!openAvCodec()) {
+        return;
+    }
+
+    prepareReadFrame(output);
+
+    readFrame();
+
+    releaseResource();
+    LOGI(TAG, "%s", "转码结束");
+}
+
 void ffmpegRegister() {
     av_register_all();
 }
@@ -204,37 +236,7 @@ void readFrame() {
     }
 }
 
-void videoDecode(const char *input, const char *output) {
 
-    LOGI(TAG, "%s", "开始转码");
-
-    //1 注册所有组件
-    ffmpegRegister();
-
-    if (!getStreamInfo(input)) {
-        return;
-    }
-
-    if (!getVideoIndex()) {
-        return;
-    }
-
-    if (!getAVCodec()) {
-        return;
-    }
-
-
-    if (!openAvCodec()) {
-        return;
-    }
-
-    prepareReadFrame(output);
-
-    readFrame();
-
-    releaseResource();
-    LOGI(TAG, "%s", "转码结束");
-}
 
 void releaseResource() {
     fclose(fp_yuv);
