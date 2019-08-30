@@ -43,13 +43,17 @@ struct SwsContext *sws_ctx;
 FILE *fp_yuv;
 
 
-
 /**
  * 将视频转码为YUV420
  * @param input
  * @param output
  */
 void videoDecode(const char *input, const char *output);
+
+/**
+ * 使用FFmpeg 播放视频
+ */
+void videoPlay(const char *input);
 
 /**
  * 初始化
@@ -85,7 +89,10 @@ bool openAvCodec();
  * 准备对去帧数据
  * @param output
  */
-void prepareReadFrame(const char *output);
+void prepareReadFrame();
+
+
+void decodeScale(const char *output);
 
 /**
  * 循环读取帧数据

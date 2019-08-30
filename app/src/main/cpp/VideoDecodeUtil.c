@@ -11,6 +11,7 @@
 #include "VideoDecodeUtil.h"
 #include "CLogUtil.h"
 
+
 void videoDecode(const char *input, const char *output) {
 
     LOGI(TAG, "%s", "开始转码");
@@ -35,13 +36,42 @@ void videoDecode(const char *input, const char *output) {
         return;
     }
 
-    prepareReadFrame(output);
+    prepareReadFrame();
+
+    decodeScale(output);
 
     readFrame();
 
     releaseResource();
     LOGI(TAG, "%s", "转码结束");
 }
+
+void videoPlay(const char *input) {
+    //1 注册所有组件
+    ffmpegRegister();
+
+    if (!getStreamInfo(input)) {
+        return;
+    }
+
+    if (!getVideoIndex()) {
+        return;
+    }
+
+    if (!getAVCodec()) {
+        return;
+    }
+
+
+    if (!openAvCodec()) {
+        return;
+    }
+
+    prepareReadFrame();
+
+
+}
+
 
 void ffmpegRegister() {
     av_register_all();
@@ -150,7 +180,7 @@ bool openAvCodec() {
 }
 
 
-void prepareReadFrame(const char *output) {
+void prepareReadFrame() {
 //准备读取
     //缓冲区，开辟空间 AVPacket用来存储一帧一帧的压缩数据（H264）
 //    AVPacket *avPacket = (AVPacket *) av_malloc(sizeof(AVPacket));
@@ -179,6 +209,9 @@ void prepareReadFrame(const char *output) {
     av_image_fill_arrays(avFrameYUV->data, avFrameYUV->linesize, out_buffer, AV_PIX_FMT_YUV420P,
                          srcWidth, srcHeight, 1);
 
+}
+
+void decodeScale(const char *output) {
 
     //用于转码 (缩放) 的参数，转之前的宽高，转之后的宽高，格式等
     sws_ctx = sws_getContext(srcWidth, srcWidth, avCodecContext->pix_fmt,
@@ -237,13 +270,13 @@ void readFrame() {
 }
 
 
-
 void releaseResource() {
     fclose(fp_yuv);
     av_frame_free(&avFrame);
     avcodec_free_context(&avCodecContext);
     avformat_free_context(avFormatContext);
 }
+
 
 
 

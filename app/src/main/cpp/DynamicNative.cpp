@@ -242,6 +242,11 @@ void native_videoDecode(JNIEnv *env, jobject jobj, jstring inPath, jstring outPa
 }
 
 
+void native_ffmpeg_play(JNIEnv *env, jobject jobj) {
+
+}
+
+
 /**
  * 动态注册，每增加一个native方法，需要在数组中增加一个JNINativeMethod结构体；
  * JNINativeMethod 是结构体
