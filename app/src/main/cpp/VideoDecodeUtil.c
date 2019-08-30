@@ -11,36 +11,43 @@
 #include "VideoDecodeUtil.h"
 #include "CLogUtil.h"
 
-static const char *TAG = "VideoDecodeUtil";
-
-void videoDecode(const char *input, const char *output) {
-
-
-    LOGI(TAG, "%s", "开始转码");
-
-    //1 注册所有组件
+void ffmpegRegister() {
     av_register_all();
+}
 
-    AVFormatContext *avFormatContext = avformat_alloc_context();
+bool getStreamInfo(const char *input) {
+
+    avFormatContext = avformat_alloc_context();
 
     //2 打开输入视频文件
     //打开媒体文件,成功返回0；否则为负数；
-    int code = avformat_open_input(&avFormatContext, input, NULL, NULL);
+    code = avformat_open_input(&avFormatContext, input, NULL, NULL);
 
     if (code < 0) {
         LOGI(TAG, "%s", "无法打开视频文件");
-        return;
+        return false;
     }
 
     //3 获取视频文件信息
     code = avformat_find_stream_info(avFormatContext, NULL);
 
+    if (code < 0) {
+        LOGI(TAG, "%s", "无法获取视频信息");
+        return false;
+    }
+
     //添加该方法
     //av_dump_format(avFormatContext, 0, input_, 0);
 
+    return true;
+}
+
+
+bool getVideoIndex() {
+
     //获取视频流的索引位置
     //遍历所有类型的流（音频流、视频流、字幕流），找到视频流
-    int v_stream_index = -1;
+    v_stream_index = -1;
     int i = 0;
     for (; i < avFormatContext->nb_streams; i++) {
         //流的类型  为视频流;//AVMEDIA_TYPE_AUDIO 为音频流；
@@ -50,52 +57,55 @@ void videoDecode(const char *input, const char *output) {
         }
     }
 
-    if (code < 0) {
-        LOGI(TAG, "%s", "无法获取视频信息");
-        return;
-    }
-
     if (v_stream_index == -1) {
         LOGI(TAG, "%s", "找不到视频流")
-        return;
+        return false;
     }
 
     LOGI(TAG, "找到了视频流::%d", v_stream_index);
 
+    return true;
+}
+
+
+bool getAVCodec() {
     //只有知道视频的编码方式，才能够根据编码方式找到解码器
-    AVCodecParameters *avCodecParameters = avFormatContext->streams[v_stream_index]->codecpar;
+    avCodecParameters = avFormatContext->streams[v_stream_index]->codecpar;
 
     //4 根据编解码上下文中的编码ID查找对应的解码
-    AVCodec *avCodec = avcodec_find_decoder(avCodecParameters->codec_id);
+    avCodec = avcodec_find_decoder(avCodecParameters->codec_id);
 
     if (avCodec == NULL) {
         LOGI(TAG, "%s", "找不到解码器");
-        return;
+        return false;
     }
 
     //获取视频流中的编解码上下文 需要使用avcodec_free_context释放
-    AVCodecContext *avCodecContext = avcodec_alloc_context3(avCodec);
+    avCodecContext = avcodec_alloc_context3(avCodec);
 
     code = avcodec_parameters_to_context(avCodecContext, avCodecParameters);
     if (code < 0) {
         LOGI(TAG, "%s", "avcodec_parameters_to_context Fail")
-        return;
+        return false;
     }
+    return true;
+}
 
+bool openAvCodec() {
     //5 打开解码器
     code = avcodec_open2(avCodecContext, avCodec, NULL);
 
     if (code < 0) {
         LOGI(TAG, "%s", "解码器无法打开");
-        return;
+        return false;
     }
 
 
     int64_t dura = avFormatContext->duration;
 
     //输出视频信息
-    int srcWidth = avCodecParameters->width;
-    int srcHeight = avCodecParameters->height;
+    srcWidth = avCodecParameters->width;
+    srcHeight = avCodecParameters->height;
     LOGI(TAG, "视频文件格式：%d,%d", srcWidth, srcHeight);
 
 
@@ -104,12 +114,17 @@ void videoDecode(const char *input, const char *output) {
     LOGI(TAG, "视频时长：%lld", dura / 1000000);
     LOGI(TAG, "解码器名称：%s", avCodec->name);
 
-    //准备读取
+    return true;
+}
+
+
+void prepareReadFrame(const char *output) {
+//准备读取
     //缓冲区，开辟空间 AVPacket用来存储一帧一帧的压缩数据（H264）
 //    AVPacket *avPacket = (AVPacket *) av_malloc(sizeof(AVPacket));
 //    av_init_packet(avPacket);
 
-    AVPacket *avPacket = av_packet_alloc();
+    avPacket = av_packet_alloc();
     if (avPacket == NULL) {
         LOGI(TAG, "%s", "avPacket 不能为空")
         return;
@@ -117,14 +132,14 @@ void videoDecode(const char *input, const char *output) {
 
     //AVFrame用于存储解码后的像素数据（YUV）
     //内存分配
-    AVFrame *avFrame = av_frame_alloc();
+    avFrame = av_frame_alloc();
 
     //YUV420
-    AVFrame *avFrameYUV = av_frame_alloc();
+    avFrameYUV = av_frame_alloc();
 
     //只有指定了AVFrame的像素格式、画面大小才能真正分配内存
     //缓存区分配内存
-    uint8_t *out_buffer = av_malloc(
+    out_buffer = av_malloc(
             (size_t) av_image_get_buffer_size(AV_PIX_FMT_YUV420P, srcWidth, srcHeight, 1));
 
 
@@ -134,15 +149,15 @@ void videoDecode(const char *input, const char *output) {
 
 
     //用于转码 (缩放) 的参数，转之前的宽高，转之后的宽高，格式等
-    struct SwsContext *sws_ctx = sws_getContext(srcWidth, srcWidth, avCodecContext->pix_fmt,
-                                                srcWidth, srcWidth, AV_PIX_FMT_YUV420P, SWS_BICUBIC,
-                                                NULL, NULL, NULL);
+    sws_ctx = sws_getContext(srcWidth, srcWidth, avCodecContext->pix_fmt,
+                             srcWidth, srcWidth, AV_PIX_FMT_YUV420P, SWS_BICUBIC,
+                             NULL, NULL, NULL);
 
+    fp_yuv = fopen(output, "wb+");
+}
 
-    FILE *fp_yuv = fopen(output, "wb+");
-
+void readFrame() {
     int frame_count = 0;
-
     //6 一帧一帧的读取压缩数据 成功返回0，否则小于0
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
         LOGI(TAG, "解码第%d帧", frame_count);
@@ -184,19 +199,57 @@ void videoDecode(const char *input, const char *output) {
                 frame_count++;
             }
         }
-
         //释放资源
         av_packet_unref(avPacket);
     }
+}
 
-    fclose(fp_yuv);
+void videoDecode(const char *input, const char *output) {
 
-    av_frame_free(&avFrame);
-    avcodec_free_context(&avCodecContext);
-    avformat_free_context(avFormatContext);
+    LOGI(TAG, "%s", "开始转码");
 
+    //1 注册所有组件
+    ffmpegRegister();
+
+    if (!getStreamInfo(input)) {
+        return;
+    }
+
+    if (!getVideoIndex()) {
+        return;
+    }
+
+    if (!getAVCodec()) {
+        return;
+    }
+
+
+    if (!openAvCodec()) {
+        return;
+    }
+
+    prepareReadFrame(output);
+
+    readFrame();
+
+    releaseResource();
     LOGI(TAG, "%s", "转码结束");
 }
 
-void decode() {
+void releaseResource() {
+    fclose(fp_yuv);
+    av_frame_free(&avFrame);
+    avcodec_free_context(&avCodecContext);
+    avformat_free_context(avFormatContext);
 }
+
+
+
+
+
+
+
+
+
+
+
