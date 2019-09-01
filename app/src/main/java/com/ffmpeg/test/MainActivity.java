@@ -31,8 +31,12 @@ public class MainActivity extends AppCompatActivity {
                 String inPath = "/storage/emulated/0/DCIM/Camera/VID_20190828_174922.mp4";
                 String outPath = "/storage/emulated/0/DCIM/Camera/output_1280x720_yuv420p.yuv";
                 //FFmpegTest.videoDecode(inPath, outPath);
-                JNIDynamicUtils.getInstance().videoDecode(inPath, outPath);
+                //JNIDynamicUtils.getInstance().videoDecode(inPath, outPath);
                 //videoView.play(inPath);
+
+
+                String outFlvPath = "/storage/emulated/0/DCIM/Camera/flv_type.flv";
+                JNIDynamicUtils.getInstance().mp4ToFlv(inPath, outFlvPath);
             }
         });
 

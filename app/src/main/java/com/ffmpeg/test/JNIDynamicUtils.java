@@ -49,5 +49,7 @@ public class JNIDynamicUtils {
 
 
     public native void playVideo(String inPath, Surface surface);
+
+    public native void mp4ToFlv(String inPath, String outPath);
 }
 

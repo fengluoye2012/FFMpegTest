@@ -237,7 +237,7 @@ void native_videoDecode(JNIEnv *env, jobject jobj, jstring inPath, jstring outPa
 
     videoDecode(in_path, out_path);
 
-    // env->ReleaseStringChars()
+    //env->ReleaseStringChars(in_path)
 
 }
 
@@ -249,6 +249,13 @@ void native_videoDecode(JNIEnv *env, jobject jobj, jstring inPath, jstring outPa
 void native_ffmpeg_play(JNIEnv *env, jobject jobj, jstring inPath, jobject surface) {
     const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
     videoPlay(env, in_path, surface);
+}
+
+void native_mp4ToFlv(JNIEnv *env, jobject jobj, jstring inPath, jstring outPath) {
+    const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
+    const char *out_path = env->GetStringUTFChars(outPath, JNI_FALSE);
+
+    mp4Toflv(env, in_path, out_path);
 }
 
 /**
@@ -264,7 +271,8 @@ static JNINativeMethod gMethods[] = {
         {"convertStringFormJNI",        "(Ljava/lang/String;)Ljava/lang/String;",      (void *) native_convert},
         {"callJavaStaticMethod",        "()Ljava/lang/String;",                        (void *) native_call_static_method},
         {"videoDecode",                 "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_videoDecode},
-        {"playVideo",                   "(Ljava/lang/String;Landroid/view/Surface;)V", (void *) native_ffmpeg_play}
+        {"playVideo",                   "(Ljava/lang/String;Landroid/view/Surface;)V", (void *) native_ffmpeg_play},
+        {"mp4ToFlv",                    "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_mp4ToFlv}
 };
 
 //System.loadLibrary过程会自动调用JNI_OnLoad,在此动态注册；

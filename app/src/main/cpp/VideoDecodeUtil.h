@@ -49,6 +49,9 @@ ANativeWindow *aNativeWindow;
 //视频缓冲区
 ANativeWindow_Buffer aNativeWindow_buffer;
 
+AVFormatContext *outAvFormatContext;
+int *stream_mapping = NULL;
+
 /**
  * 将视频转码为YUV420
  * @param input
@@ -60,6 +63,16 @@ void videoDecode(const char *input, const char *output);
  * 使用FFmpeg 播放视频
  */
 void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface);
+
+/**
+ * 将mp4 格式转换为flv  https://www.jianshu.com/p/40e55897e9a7
+ * @param jniEnv
+ * @param input
+ * @param output
+ */
+void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output);
+
+void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt, const char *tag);
 
 /**
  * 初始化
