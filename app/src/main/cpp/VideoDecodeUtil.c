@@ -84,6 +84,7 @@ void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface) {
 void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
 
     ffmpegRegister();
+
     if (!getStreamInfo(input)) {
         return;
     }
@@ -97,100 +98,103 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
 
     size_t stream_mapping_size = (size_t) avFormatContext->nb_streams;
 
-    stream_mapping = av_mallocz_array(stream_mapping_size, sizeof(stream_mapping));
 
-    if (!stream_mapping) {
-        LOGI(TAG, "%s", "av_mallocz_array fail");
-        return;
-    }
+//    av_mallocz(stream_mapping_size);
 
-    AVOutputFormat *outAvOutputFormat = outAvFormatContext->oformat;
-    int stream_index = 0;
-    for (int i = 0; i < avFormatContext->nb_streams; ++i) {
-        AVStream *out_stream;
-        AVStream *in_stream = avFormatContext->streams[i];
-        AVCodecParameters *in_codecpar = in_stream->codecpar;
-        enum AVMediaType in_type = in_codecpar->codec_type;
-        if (in_type != AVMEDIA_TYPE_AUDIO && in_type != AVMEDIA_TYPE_VIDEO &&
-            in_type != AVMEDIA_TYPE_SUBTITLE) {
-            stream_mapping[i] = -1;
-            continue;
-        }
-
-        stream_mapping[i] = stream_index++;
-        out_stream = avformat_new_stream(outAvFormatContext, NULL);
-        if (!out_stream) {
-            return;
-        }
-
-        code = avcodec_parameters_copy(out_stream->codecpar, in_codecpar);
-        if (code < 0) {
-            LOGI(TAG, "%s", "avcodec_parameters_copy Fail");
-            return;
-        }
-
-        out_stream->codecpar->codec_tag = 0;
-
-    }
-    av_dump_format(outAvFormatContext, 0, output, 1);
-
-    if (!(outAvFormatContext->flags & AVFMT_NOFILE)) {
-        code = avio_open(&outAvFormatContext->pb, output, AVIO_FLAG_WRITE);
-        if (code < 0) {
-            LOGI(TAG, "%s", "avio_open Fail");
-            return;
-        }
-    }
-
-    code = avformat_write_header(outAvFormatContext, NULL);
-
-    if (code < 0) {
-        LOGI(TAG, "%s", "avformat_write_header Fail");
-        return;
-    }
-
-    AVPacket *pkt = av_packet_alloc();
-    AVStream *in_stream, *out_stream;
-
-    while (av_read_frame(avFormatContext, pkt) >= 0) {
-        in_stream = avFormatContext->streams[pkt->stream_index];
-        if (pkt->stream_index >= stream_mapping_size || stream_mapping[pkt->stream_index] < 0) {
-            continue;
-        }
-
-        pkt->stream_index = stream_mapping[pkt->stream_index];
-        out_stream = outAvFormatContext->streams[pkt->stream_index];
-
-        log_packet(avFormatContext, pkt, "in");
-
-        pkt->pts = av_rescale_q_rnd(pkt->pts, in_stream->time_base, out_stream->time_base,
-                                    AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX);
-
-        pkt->dts = av_rescale_q_rnd(pkt->dts, in_stream->time_base, out_stream->time_base,
-                                    AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX);
-
-        pkt->pos = -1;
-
-        log_packet(outAvFormatContext, pkt, "out");
-
-        code = av_interleaved_write_frame(outAvFormatContext, pkt);
-
-        if (code < 0) {
-            LOGI(TAG, "%s", "av_interleaved_write_frame Fail");
-            break;
-        }
-
-        av_packet_unref(pkt);
-    }
-    av_write_trailer(outAvFormatContext);
-
-    //释放资源
-    avformat_close_input(&avFormatContext);
-    if (outAvFormatContext && !(outAvOutputFormat->flags & AVFMT_NOFILE)) {
-        avio_closep(&outAvFormatContext->pb);
-    }
-    avformat_free_context(outAvFormatContext);
-    av_free(&stream_mapping);
+//    stream_mapping = av_mallocz_array(stream_mapping_size, sizeof(stream_mapping));
+//
+//    if (!stream_mapping) {
+//        LOGI(TAG, "%s", "av_mallocz_array fail");
+//        return;
+//    }
+//
+//    AVOutputFormat *outAvOutputFormat = outAvFormatContext->oformat;
+//    int stream_index = 0;
+//    for (int i = 0; i < avFormatContext->nb_streams; ++i) {
+//        AVStream *out_stream;
+//        AVStream *in_stream = avFormatContext->streams[i];
+//        AVCodecParameters *in_codecpar = in_stream->codecpar;
+//        enum AVMediaType in_type = in_codecpar->codec_type;
+//        if (in_type != AVMEDIA_TYPE_AUDIO && in_type != AVMEDIA_TYPE_VIDEO &&
+//            in_type != AVMEDIA_TYPE_SUBTITLE) {
+//            stream_mapping[i] = -1;
+//            continue;
+//        }
+//
+//        stream_mapping[i] = stream_index++;
+//        out_stream = avformat_new_stream(outAvFormatContext, NULL);
+//        if (!out_stream) {
+//            return;
+//        }
+//
+//        code = avcodec_parameters_copy(out_stream->codecpar, in_codecpar);
+//        if (code < 0) {
+//            LOGI(TAG, "%s", "avcodec_parameters_copy Fail");
+//            return;
+//        }
+//
+//        out_stream->codecpar->codec_tag = 0;
+//
+//    }
+//    av_dump_format(outAvFormatContext, 0, output, 1);
+//
+//    if (!(outAvFormatContext->flags & AVFMT_NOFILE)) {
+//        code = avio_open(&outAvFormatContext->pb, output, AVIO_FLAG_WRITE);
+//        if (code < 0) {
+//            LOGI(TAG, "%s", "avio_open Fail");
+//            return;
+//        }
+//    }
+//
+//    code = avformat_write_header(outAvFormatContext, NULL);
+//
+//    if (code < 0) {
+//        LOGI(TAG, "%s", "avformat_write_header Fail");
+//        return;
+//    }
+//
+//    AVPacket *pkt = av_packet_alloc();
+//    AVStream *in_stream, *out_stream;
+//
+//    while (av_read_frame(avFormatContext, pkt) >= 0) {
+//        in_stream = avFormatContext->streams[pkt->stream_index];
+//        if (pkt->stream_index >= stream_mapping_size || stream_mapping[pkt->stream_index] < 0) {
+//            continue;
+//        }
+//
+//        pkt->stream_index = stream_mapping[pkt->stream_index];
+//        out_stream = outAvFormatContext->streams[pkt->stream_index];
+//
+//        log_packet(avFormatContext, pkt, "in");
+//
+//        pkt->pts = av_rescale_q_rnd(pkt->pts, in_stream->time_base, out_stream->time_base,
+//                                    AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX);
+//
+//        pkt->dts = av_rescale_q_rnd(pkt->dts, in_stream->time_base, out_stream->time_base,
+//                                    AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX);
+//
+//        pkt->pos = -1;
+//
+//        log_packet(outAvFormatContext, pkt, "out");
+//
+//        code = av_interleaved_write_frame(outAvFormatContext, pkt);
+//
+//        if (code < 0) {
+//            LOGI(TAG, "%s", "av_interleaved_write_frame Fail");
+//            break;
+//        }
+//
+//        av_packet_unref(pkt);
+//    }
+//    av_write_trailer(outAvFormatContext);
+//
+//    //释放资源
+//    avformat_close_input(&avFormatContext);
+//    if (outAvFormatContext && !(outAvOutputFormat->flags & AVFMT_NOFILE)) {
+//        avio_closep(&outAvFormatContext->pb);
+//    }
+//    avformat_free_context(outAvFormatContext);
+//    av_free(&stream_mapping);
 }
 
 
