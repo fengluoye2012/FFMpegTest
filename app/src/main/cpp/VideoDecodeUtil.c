@@ -83,12 +83,14 @@ void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface) {
 
 void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
 
+    //1 注册，并且获取StreamInfo；
     ffmpegRegister();
 
     if (!getStreamInfo(input)) {
         return;
     }
 
+    //2 通过avformat_alloc_output_context2() 获取 输出 AVFormatContext；
     code = avformat_alloc_output_context2(&outAvFormatContext, NULL, NULL, output);
 
     if (code) {
@@ -97,7 +99,6 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
     }
 
     int stream_mapping_size = avFormatContext->nb_streams;
-
     //定义一个数组，数组申请动态分配内存；
     int *stream_mapping = NULL;
 
@@ -111,9 +112,12 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
 
     AVOutputFormat *outAvOutputFormat = outAvFormatContext->oformat;
     int stream_index = 0;
+
+    //遍历avformat_new_stream()复制流，avcodec_parameters_copy() 复制参数；
     for (int i = 0; i < avFormatContext->nb_streams; ++i) {
         AVStream *out_stream;
         AVStream *in_stream = avFormatContext->streams[i];
+
         AVCodecParameters *in_codecpar = in_stream->codecpar;
         enum AVMediaType in_type = in_codecpar->codec_type;
         if (in_type != AVMEDIA_TYPE_AUDIO && in_type != AVMEDIA_TYPE_VIDEO &&
@@ -135,8 +139,8 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
         }
 
         out_stream->codecpar->codec_tag = 0;
-
     }
+
 
     av_dump_format(outAvFormatContext, 0, output, 1);
     if (!(outAvFormatContext->flags & AVFMT_NOFILE)) {
@@ -147,6 +151,7 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
         }
     }
 
+    //写入头文件
     code = avformat_write_header(outAvFormatContext, NULL);
 
     if (code < 0) {
@@ -158,7 +163,7 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
     AVStream *in_stream, *out_stream;
     LOGE(TAG, "%s", "开始读取Frame");
 
-
+    //读取每一帧
     while (av_read_frame(avFormatContext, pkt) >= 0) {
         in_stream = avFormatContext->streams[pkt->stream_index];
         if (pkt->stream_index >= stream_mapping_size || stream_mapping[pkt->stream_index] < 0) {
@@ -189,8 +194,8 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
 
         av_packet_unref(pkt);
     }
+    LOGE(TAG, "%s", "读取完成");
 
-    LOGE(TAG,"%s","读取完成");
     av_write_trailer(outAvFormatContext);
     //释放资源
     avformat_close_input(&avFormatContext);
