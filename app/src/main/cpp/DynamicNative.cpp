@@ -121,7 +121,7 @@ void *thread_01(const string name) {
 }
 
 void *thread_callback(void *cha) {
-    char *name = (char *) cha;
+    char name[] = "线程-2";
 
     //记录从jvm中申请JNIEnv*的状态
     int status;
@@ -179,18 +179,19 @@ void threadTest(JNIEnv *env, jobject jobj) {
     // 在附加之前，线程不包含任何 JNIEnv，也无法调用 JNI。
     //JNIEnv 不能跨线程传递
 
-    string str = string("线程-2");
+    string str1 = string("线程-1");
     //3.1 thread 创建线程
-    thread thread1(thread_01, str);
+    thread thread1(thread_01, str1);
     //thread1.join();  //主线程等待子线程执行完成之后，再执行；
     thread1.detach(); //子线程无需和主线程会合，各自执行；
 
 
+    string str2 = string("线程-2");
     //3.2 pthread_create创建线程 https://www.jianshu.com/p/986d608a8a35
     //线程id
     pthread_t tid;
 
-    char *cha = const_cast<char *>(str.c_str());
+    char *cha = const_cast<char *>(str2.c_str());
     /*
      * pthread_t *thread：表示创建的线程的id号
      * const pthread_attr_t *attr：表示线程的属性设置
@@ -223,10 +224,7 @@ jstring native_call_static_method(JNIEnv *env, jobject jobj) {
 
     LOGI("Android Version - %s", "静态方法被调用");
 
-    //threadTest(env, jobj);
-
-//    GetTicks();
-
+    threadTest(env, jobj);
 
     return env->NewStringUTF("动态");
 }

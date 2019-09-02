@@ -234,6 +234,19 @@ void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt, const char 
 
 }
 
+
+/**
+ * 将MP4 转换为 M3U8
+ * @param jniEnv
+ * @param input
+ * @param output
+ */
+void mp4ToM3U8(JNIEnv *jniEnv, const char *input, const char *output) {
+
+
+
+}
+
 void playReadFrame() {
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
         if (avPacket->stream_index == v_stream_index) {

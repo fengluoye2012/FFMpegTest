@@ -73,6 +73,8 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output);
 
 void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt, const char *tag);
 
+void mp4ToM3U8(JNIEnv *jniEnv, const char *input, const char *output);
+
 /**
  * 初始化
  */
