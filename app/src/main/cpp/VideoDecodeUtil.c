@@ -81,16 +81,30 @@ void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface) {
     releaseResource();
 }
 
+/**
+ * mp4转成flv格式文件步骤如下:
+ *
+ * 1.打开输入文件，创建输入文件和输出文件的上下文环境
+ * 2.遍历输入文件的每一路流，每个输入流对应创建一个输出流，将输入流中的编解码参数直接拷贝到输出流中。
+ * 3.文件的写入。
+ * 先写入新的多媒体文件的头。
+ * 然后遍历输入文件的每一帧，对每一帧进行时间基的转换，转换好后写入新的多媒体文件。
+ * 最后再多媒体文件中写入文件尾。
+ *
+ * @param jniEnv
+ * @param input
+ * @param output
+ */
 void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
 
-    //1 注册，并且获取StreamInfo；
+    //1.1 注册，并且获取StreamInfo；
     ffmpegRegister();
 
     if (!getStreamInfo(input)) {
         return;
     }
 
-    //2 通过avformat_alloc_output_context2() 获取 输出 AVFormatContext；
+    //1.2 通过avformat_alloc_output_context2() 获取 输出文件的 AVFormatContext；
     code = avformat_alloc_output_context2(&outAvFormatContext, NULL, NULL, output);
 
     if (code) {
@@ -98,6 +112,7 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
         return;
     }
 
+    //2 遍历输入文件的每一路流，每个输入流对应创建一个输出流，将输入流中的编解码参数直接拷贝到输出流中。
     int stream_mapping_size = avFormatContext->nb_streams;
     //定义一个数组，数组申请动态分配内存；
     int *stream_mapping = NULL;
@@ -113,7 +128,7 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
     AVOutputFormat *outAvOutputFormat = outAvFormatContext->oformat;
     int stream_index = 0;
 
-    //遍历avformat_new_stream()复制流，avcodec_parameters_copy() 复制参数；
+    // 遍历avformat_new_stream()复制流，avcodec_parameters_copy() 复制参数；
     for (int i = 0; i < avFormatContext->nb_streams; ++i) {
         AVStream *out_stream;
         AVStream *in_stream = avFormatContext->streams[i];
