@@ -50,7 +50,6 @@ ANativeWindow *aNativeWindow;
 ANativeWindow_Buffer aNativeWindow_buffer;
 
 AVFormatContext *outAvFormatContext;
-//int *stream_mapping = NULL;
 
 /**
  * 将视频转码为YUV420
