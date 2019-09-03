@@ -46,10 +46,22 @@ JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接�
 3）视频播放：https://www.jianshu.com/p/c7de148e951c
 
 4）视频转码
-4.1) mp4 转 flv:https://www.jianshu.com/p/1c80c3746975
+
+
+在FFmpeg中，mux指复用，是multiplex的缩写，表示将多路流(视频、音频、字幕等)混入一路输出中(普通文件、流等)。
+demux指解复用，是mux的反操作，表示从一路输入中分离出多路流(视频、音频、字幕等)。mux处理的是输入格式，demux处理的输出格式。
+FFmpeg封装格式处理 https://www.cnblogs.com/leisure_chn/p/10506636.html
+
+HLS 是新一代流媒体传输协议，其基本实现原理为将一个大的媒体文件进行分片，将该分片文件资源路径记录于 m3u8 文件（即 playlist）内，
+其中附带一些额外描述（比如该资源的多带宽信息···）用于提供给客户端。客户端依据该 m3u8 文件即可获取对应的媒体资源，进行播放。
+
+4.1)封装格式转换，就是在AVI，FLV，MKV,MP4这些格式之间转换（对应.avi，.flv，.mkv，.mp4文件）。https://www.cnblogs.com/yuweifeng/p/9021360.html
+4.1.1) mp4 转 flv:https://www.jianshu.com/p/1c80c3746975
+4.1.2) mp4 转 avi:
 4.2) mp4 转 m3u8：
 https://blog.csdn.net/blueboyhi/article/details/40107683
 https://blog.csdn.net/zhuweigangzwg/article/details/50837005
+https://blog.csdn.net/yingyemin/article/details/76570576
 
 
 三、C、C++的区别

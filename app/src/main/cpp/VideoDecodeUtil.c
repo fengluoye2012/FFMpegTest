@@ -13,6 +13,7 @@
 #include "CLogUtil.h"
 #include <android/native_window_jni.h>
 #include <libavutil/timestamp.h>
+#include <libavutil/frame.h>
 
 
 void videoDecode(const char *input, const char *output) {

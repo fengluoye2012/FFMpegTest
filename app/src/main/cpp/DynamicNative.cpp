@@ -21,6 +21,7 @@ extern "C" {
 #include "include/libavutil/avutil.h"
 #include "VideoDecodeUtil.h"
 #include "CPlusLogUtil.h"
+#include "Mp4ToM3U8.h"
 }
 
 
@@ -256,6 +257,14 @@ void native_mp4ToFlv(JNIEnv *env, jobject jobj, jstring inPath, jstring outPath)
     mp4Toflv(env, in_path, out_path);
 }
 
+void native_mp4ToM3U8(JNIEnv *env, jobject jobj, jstring inPath, jstring outPath) {
+
+    const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
+    const char *out_path = env->GetStringUTFChars(outPath, JNI_FALSE);
+
+    decodeToM3U8(in_path, out_path);
+}
+
 /**
  * 动态注册，每增加一个native方法，需要在数组中增加一个JNINativeMethod结构体；
  * JNINativeMethod 是结构体
@@ -270,7 +279,8 @@ static JNINativeMethod gMethods[] = {
         {"callJavaStaticMethod",        "()Ljava/lang/String;",                        (void *) native_call_static_method},
         {"videoDecode",                 "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_videoDecode},
         {"playVideo",                   "(Ljava/lang/String;Landroid/view/Surface;)V", (void *) native_ffmpeg_play},
-        {"mp4ToFlv",                    "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_mp4ToFlv}
+        {"mp4ToFlv",                    "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_mp4ToFlv},
+        {"mp4ToFlv",                    "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_mp4ToM3U8}
 };
 
 //System.loadLibrary过程会自动调用JNI_OnLoad,在此动态注册；

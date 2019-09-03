@@ -51,5 +51,7 @@ public class JNIDynamicUtils {
     public native void playVideo(String inPath, Surface surface);
 
     public native void mp4ToFlv(String inPath, String outPath);
+
+    public native void mp4ToM3U8(String inPath, String outPath);
 }
 
