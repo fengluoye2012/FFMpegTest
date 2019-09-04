@@ -21,7 +21,6 @@ extern "C" {
 #include "include/libavutil/avutil.h"
 #include "VideoDecodeUtil.h"
 #include "CPlusLogUtil.h"
-#include "Mp4ToM3U8.h"
 }
 
 
@@ -262,7 +261,7 @@ void native_mp4ToM3U8(JNIEnv *env, jobject jobj, jstring inPath, jstring outPath
     const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
     const char *out_path = env->GetStringUTFChars(outPath, JNI_FALSE);
 
-    decodeToM3U8(in_path, out_path);
+//    decodeToM3U8(in_path, out_path);
 }
 
 /**
