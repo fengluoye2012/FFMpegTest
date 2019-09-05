@@ -37,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
                 //JNIDynamicUtils.getInstance().videoDecode(inPath, outPath);
                 //videoView.play(outFlvPath);
 
-                JNIDynamicUtils.getInstance().mp4ToFlv(inPath, outFlvPath);
+                //JNIDynamicUtils.getInstance().mp4ToFlv(inPath, outFlvPath);
+                JNIDynamicUtils.getInstance().singleton();
             }
         });
 

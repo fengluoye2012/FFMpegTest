@@ -13,6 +13,7 @@
 #include "android/log.h"
 #include "thread"
 #include "tgmath.h"
+#include "Singleton/SingletonTest.h"
 
 //引用C的头文件
 extern "C" {
@@ -31,7 +32,6 @@ using std::string;
 JavaVM *javaVM;
 jobject obj;
 // Android log function wrappers
-static const char *kTAG = "DynamicNative";
 
 //C++ 层代码
 jstring native_hello(JNIEnv *env, jobject obj) {
@@ -262,6 +262,13 @@ void native_mp4ToM3U8(JNIEnv *env, jobject jobj, jstring inPath, jstring outPath
     const char *out_path = env->GetStringUTFChars(outPath, JNI_FALSE);
 
 //    decodeToM3U8(in_path, out_path);
+
+
+
+}
+
+void native_singleton(JNIEnv *env, jobject jobj) {
+    SingletonTest::getInstance()->printStr();
 }
 
 /**
@@ -279,7 +286,8 @@ static JNINativeMethod gMethods[] = {
         {"videoDecode",                 "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_videoDecode},
         {"playVideo",                   "(Ljava/lang/String;Landroid/view/Surface;)V", (void *) native_ffmpeg_play},
         {"mp4ToFlv",                    "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_mp4ToFlv},
-        {"mp4ToFlv",                    "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_mp4ToM3U8}
+        {"mp4ToM3U8",                   "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_mp4ToM3U8},
+        {"singleton",                   "()V",                                         (void *) native_singleton}
 };
 
 //System.loadLibrary过程会自动调用JNI_OnLoad,在此动态注册；
