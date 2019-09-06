@@ -7,6 +7,6 @@
 
 
 
-//void SingletonTest::printStr() {
-//    LOGI("%s", "单例模式");
-//}
+void SingletonTest::printStr() {
+    LOGE("%s", "c++  饿汉式 单利模式");
+}

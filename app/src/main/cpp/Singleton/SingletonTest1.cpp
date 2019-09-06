@@ -12,6 +12,11 @@ SingletonTest1::SingletonTest1() {
 }
 
 
+void SingletonTest1::printStr() {
+    LOGI("%s", "懒汉式 单利设计模式");
+}
+
+//懒汉式单利模式   非线程安全；
 SingletonTest1 *SingletonTest1::getInstance() {
     if (instance == NULL) {
         instance = new SingletonTest1();
@@ -19,6 +24,15 @@ SingletonTest1 *SingletonTest1::getInstance() {
     return instance;
 }
 
-void SingletonTest1::printStr() {
-    LOGI("%s", "懒汉式 单利设计模式");
+//懒汉 单利模式   线程安全
+SingletonTest1 *SingletonTest1::getInstanceLock() {
+
+    if(instance == NULL){
+
+    }
+
+    return nullptr;
 }
+
+
+

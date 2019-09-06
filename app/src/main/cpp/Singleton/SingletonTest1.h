@@ -14,15 +14,19 @@
 
 class SingletonTest1 {
 
-public:
 
+    //私有变量无法在源文件访问
+private:
+    SingletonTest1();
+
+public:
     static SingletonTest1 *instance;
 
     static SingletonTest1 *getInstance();
+    static SingletonTest1 *getInstanceLock();
 
     void printStr();
 
-    SingletonTest1();
 };
 
 
