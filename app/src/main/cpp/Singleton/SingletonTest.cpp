@@ -6,7 +6,7 @@
 #include "../CPlusLogUtil.h"
 
 
+
 //void SingletonTest::printStr() {
 //    LOGI("%s", "单例模式");
 //}
-

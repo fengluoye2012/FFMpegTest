@@ -14,6 +14,8 @@
 #include "thread"
 #include "tgmath.h"
 #include "Singleton/SingletonTest.h"
+#include "Singleton/SingletonTest1.h"
+#include "CPlusLogUtil.h"
 
 //引用C的头文件
 extern "C" {
@@ -21,7 +23,6 @@ extern "C" {
 #include "include/libavformat/avformat.h"
 #include "include/libavutil/avutil.h"
 #include "VideoDecodeUtil.h"
-#include "CPlusLogUtil.h"
 }
 
 
@@ -269,6 +270,10 @@ void native_mp4ToM3U8(JNIEnv *env, jobject jobj, jstring inPath, jstring outPath
 
 void native_singleton(JNIEnv *env, jobject jobj) {
     SingletonTest::getInstance()->printStr();
+    SingletonTest1::getInstance()->printStr();
+
+    SingletonTest1::instance->printStr();
+
 }
 
 /**
