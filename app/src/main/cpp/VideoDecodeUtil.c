@@ -14,6 +14,7 @@
 #include <android/native_window_jni.h>
 #include <libavutil/timestamp.h>
 #include <libavutil/frame.h>
+#include <libswresample/swresample.h>
 
 
 void videoDecode(const char *input, const char *output) {
@@ -80,6 +81,138 @@ void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface) {
 
 
     releaseResource();
+}
+
+/**
+ * FFmpeg 配合 AudioTrack 播放音乐，通过反射的方式调用Java的AudioTrack 播放音乐；
+ * @param jniEnv
+ * @param jobj
+ * @param input
+ */
+void audioPlay(JNIEnv *jniEnv, jobject jobj, const char *input) {
+    LOGE(TAG, "%s", "播放音频文件")
+
+    ffmpegRegister();
+    if (!getStreamInfo(input)) {
+        return;
+    }
+
+    if (!getAudioIndex()) {
+        return;
+    }
+
+    if (!getAVCodec()) {
+        return;
+    }
+
+    if (!openAvCodec()) {
+        return;
+    }
+
+    audioPrepareReadFrame();
+
+    readAudioFrame(jniEnv, jobj);
+
+}
+
+//avcodec_decode_audio4()  已废弃  使用avcodec_send_packet() and avcodec_receive_frame()
+void readAudioFrame(JNIEnv *jniEnv, jobject jobj) {
+    //获取通道数
+    int out_channel_nb = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
+    jclass cls = (*jniEnv)->GetObjectClass(jniEnv, jobj);
+    jmethodID methodId = (*jniEnv)->GetMethodID(jniEnv, cls, "createTrack", "(II)V");
+    //根绝返回值调用对应的方法
+    (*jniEnv)->CallVoidMethod(jniEnv, jobj, methodId, 44100, out_channel_nb);
+
+    jmethodID playTrackId = (*jniEnv)->GetMethodID(jniEnv, cls, "playTrack", "([BI)V");
+
+    while (av_read_frame(avFormatContext, avPacket) >= 0) {
+        if (avPacket->stream_index == target_stream_index) {
+            LOGI(TAG, "%s", "解码");
+            //解码 mp3  编码格式frame---pcm  frame
+            code = avcodec_send_packet(avCodecContext, avPacket);
+            if (code < 0) {
+                LOGI(TAG, "%s", "avcodec_send_packet Fail")
+            }
+
+            //这个不能改成使用code 判断；
+            while (1) {
+                code = avcodec_receive_frame(avCodecContext, avFrame);
+                if (code < 0) {
+                    LOGI(TAG, "%s", "avcodec_receive_frame Fail")
+                    break;
+                }
+
+                swr_convert(swrContext, &out_buffer, 44100 * 2, (const uint8_t **) avFrame->data,
+                            avFrame->nb_samples);
+
+                //缓冲区大小
+                int size = av_samples_get_buffer_size(NULL, out_channel_nb, avFrame->nb_samples,
+                                                      AV_SAMPLE_FMT_S16, 1);
+
+
+                jbyteArray audio_sample_array = (*jniEnv)->NewByteArray(jniEnv, size);
+
+                (*jniEnv)->SetByteArrayRegion(jniEnv, audio_sample_array, 0, size,
+                                              (const jbyte *) out_buffer);
+
+                (*jniEnv)->CallVoidMethod(jniEnv, jobj, playTrackId, audio_sample_array, size);
+                (*jniEnv)->DeleteLocalRef(jniEnv, audio_sample_array);
+            }
+        }
+    }
+
+    av_frame_free(&avFrame);
+    swr_free(&swrContext);
+    avcodec_close(avCodecContext);
+    avformat_free_context(avFormatContext);
+}
+
+//为读取音频帧准备
+void audioPrepareReadFrame() {
+    //av_packet_alloc()分配一个AVPacket并将其字段设置为默认值。必须使用av_packet_free()释放生成的结构。
+    avPacket = av_packet_alloc();
+    //av_frame_alloc()分配一个AVFrame并将其字段设置为默认值。必须使用av_frame_free()释放生成的结构。
+    avFrame = av_frame_alloc();
+
+    //得到SwrContext,进行重采样，在调用swr_init()方法之前，必须先调用swr_alloc_set_opts();
+    swrContext = swr_alloc();
+
+    //分配内存
+    out_buffer = av_malloc(44100 * 2);
+
+    //输出声道布局（立体声）
+    uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;
+
+    //输出采样位数 16位
+    enum AVSampleFormat out_format = AV_SAMPLE_FMT_S16;
+
+    //输出采样率必须与输入相同
+    int out_sample_rate = avCodecContext->sample_rate;
+
+    //swr_alloc_set_opts 将PCM 源文件的采样格式转换为自己希望的采样格式
+    swr_alloc_set_opts(swrContext, out_ch_layout, out_format, out_sample_rate,
+                       avCodecContext->channel_layout, avCodecContext->sample_fmt,
+                       avCodecContext->sample_rate, 0, NULL);
+
+    swr_init(swrContext);
+}
+
+bool getAudioIndex() {
+
+    //从流文件中找到对应音频流的index;
+    for (int i = 0; i < avFormatContext->nb_streams; ++i) {
+        if (AVMEDIA_TYPE_AUDIO == avFormatContext->streams[i]->codecpar->codec_type) {
+            target_stream_index = i;
+            break;
+        }
+    }
+
+    if (target_stream_index > -1) {
+        LOGI(TAG, "找到视频流下标::%d", target_stream_index);
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -245,12 +378,11 @@ void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt, const char 
 void mp4ToM3U8(JNIEnv *jniEnv, const char *input, const char *output) {
 
 
-
 }
 
 void playReadFrame() {
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
-        if (avPacket->stream_index == v_stream_index) {
+        if (avPacket->stream_index == target_stream_index) {
 
             LOGI(TAG, "%s", "解码");
             avcodec_send_packet(avCodecContext, avPacket);
@@ -348,22 +480,22 @@ bool getVideoIndex() {
 
     //获取视频流的索引位置
     //遍历所有类型的流（音频流、视频流、字幕流），找到视频流
-    v_stream_index = -1;
+    target_stream_index = -1;
     int i = 0;
     for (; i < avFormatContext->nb_streams; i++) {
         //流的类型  为视频流;//AVMEDIA_TYPE_AUDIO 为音频流；
         if (avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            v_stream_index = i;
+            target_stream_index = i;
             break;
         }
     }
 
-    if (v_stream_index == -1) {
+    if (target_stream_index == -1) {
         LOGI(TAG, "%s", "找不到视频流")
         return false;
     }
 
-    LOGI(TAG, "找到了视频流::%d", v_stream_index);
+    LOGI(TAG, "找到了视频流::%d", target_stream_index);
 
     return true;
 }
@@ -371,7 +503,7 @@ bool getVideoIndex() {
 
 bool getAVCodec() {
     //只有知道视频的编码方式，才能够根据编码方式找到解码器
-    avCodecParameters = avFormatContext->streams[v_stream_index]->codecpar;
+    avCodecParameters = avFormatContext->streams[target_stream_index]->codecpar;
 
     //4 根据编解码上下文中的编码ID查找对应的解码
     avCodec = avcodec_find_decoder(avCodecParameters->codec_id);
@@ -465,7 +597,7 @@ void readFrame() {
         LOGI(TAG, "解码第%d帧", frame_count);
 
         //只压缩视频流数据（根据流的索引位置判断）
-        if (avPacket->stream_index == v_stream_index) {
+        if (avPacket->stream_index == target_stream_index) {
             //7 解码一帧视频压缩数据，得到视频像素数据
             code = avcodec_send_packet(avCodecContext, avPacket);
             av_packet_unref(avPacket);

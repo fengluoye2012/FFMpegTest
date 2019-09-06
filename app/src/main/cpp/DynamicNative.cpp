@@ -236,8 +236,8 @@ void native_videoDecode(JNIEnv *env, jobject jobj, jstring inPath, jstring outPa
 
     videoDecode(in_path, out_path);
 
-    //env->ReleaseStringChars(in_path)
-
+    env->ReleaseStringUTFChars(inPath, in_path);
+    env->ReleaseStringUTFChars(outPath, out_path);
 }
 
 /**
@@ -248,6 +248,20 @@ void native_videoDecode(JNIEnv *env, jobject jobj, jstring inPath, jstring outPa
 void native_ffmpeg_play(JNIEnv *env, jobject jobj, jstring inPath, jobject surface) {
     const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
     videoPlay(env, in_path, surface);
+    env->ReleaseStringUTFChars(inPath, in_path);
+}
+
+/**
+ * 音频播放
+ * @param env
+ * @param jobj
+ * @param inPath
+ */
+void native_ffmpeg_play_audio(JNIEnv *env, jobject jobj, jstring inPath) {
+    const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
+    audioPlay(env, jobj, in_path);
+    //释放字符
+    env->ReleaseStringUTFChars(inPath, in_path);
 }
 
 void native_mp4ToFlv(JNIEnv *env, jobject jobj, jstring inPath, jstring outPath) {
@@ -290,6 +304,7 @@ void native_singleton(JNIEnv *env, jobject jobj) {
 
 }
 
+
 /**
  * 动态注册，每增加一个native方法，需要在数组中增加一个JNINativeMethod结构体；
  * JNINativeMethod 是结构体
@@ -306,7 +321,8 @@ static JNINativeMethod gMethods[] = {
         {"playVideo",                   "(Ljava/lang/String;Landroid/view/Surface;)V", (void *) native_ffmpeg_play},
         {"mp4ToFlv",                    "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_mp4ToFlv},
         {"mp4ToM3U8",                   "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_mp4ToM3U8},
-        {"singleton",                   "()V",                                         (void *) native_singleton}
+        {"singleton",                   "()V",                                         (void *) native_singleton},
+        {"playAudio",                   "(Ljava/lang/String;)V",                       (void *) native_ffmpeg_play_audio}
 };
 
 //System.loadLibrary过程会自动调用JNI_OnLoad,在此动态注册；

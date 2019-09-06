@@ -14,7 +14,6 @@
 
 class SingletonTest1 {
 
-
     //私有变量无法在源文件访问
 private:
     SingletonTest1();

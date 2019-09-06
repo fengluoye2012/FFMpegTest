@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <jni.h>
 #include <android/native_window.h>
+#include <libswresample/swresample.h>
 
 #ifndef FFMPEGTEST_VIDEODECODEUTIL_H
 #define FFMPEGTEST_VIDEODECODEUTIL_H
@@ -20,7 +21,8 @@ static const char *TAG = "VideoDecodeUtil";
 AVFormatContext *avFormatContext;
 int code;
 
-int v_stream_index;
+//对应视频流、音频流的下标；
+int target_stream_index;
 
 AVCodec *avCodec;
 
@@ -51,6 +53,8 @@ ANativeWindow_Buffer aNativeWindow_buffer;
 
 AVFormatContext *outAvFormatContext;
 
+struct SwrContext *swrContext;
+
 /**
  * 将视频转码为YUV420
  * @param input
@@ -62,6 +66,21 @@ void videoDecode(const char *input, const char *output);
  * 使用FFmpeg 播放视频
  */
 void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface);
+
+/**
+ * 使用FFmpeg 播放音频
+ * @param jniEnv
+ * @param input
+ */
+void audioPlay(JNIEnv *jniEnv,jobject jobj, const char *input);
+
+bool getAudioIndex();
+
+void audioPrepareReadFrame();
+
+void readAudioFrame(JNIEnv *jniEnv,jobject jobj);
+
+
 
 /**
  * 将mp4 格式转换为flv  https://www.jianshu.com/p/40e55897e9a7

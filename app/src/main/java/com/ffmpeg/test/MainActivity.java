@@ -38,7 +38,10 @@ public class MainActivity extends AppCompatActivity {
                 //videoView.play(outFlvPath);
 
                 //JNIDynamicUtils.getInstance().mp4ToFlv(inPath, outFlvPath);
-                JNIDynamicUtils.getInstance().singleton();
+                //JNIDynamicUtils.getInstance().singleton();
+
+                String inPathAudio = "/storage/emulated/0/netease/cloudmusic/Music/千陵安浅 - 归去来兮（原调版）（Cover：叶炫清）.mp3";
+                JNIDynamicUtils.getInstance().playAudio(inPathAudio);
             }
         });
 
@@ -54,8 +57,6 @@ public class MainActivity extends AppCompatActivity {
     private void jniFormCPlus() {
         textView.setText(JNIDynamicUtils.getHelloWorldFormDynamicJNI());
         convertStr.setText(JNIDynamicUtils.getInstance().convertStringFormJNI("Hello"));
-        Log.e(TAG, "动态：：" + JNIDynamicUtils.getInstance().callJavaStaticMethod());
+        //Log.e(TAG, "动态：：" + JNIDynamicUtils.getInstance().callJavaStaticMethod());
     }
-
-
 }
