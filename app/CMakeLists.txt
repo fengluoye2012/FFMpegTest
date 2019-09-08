@@ -22,6 +22,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDR
 # 将.cpp文件配置在CMakeLists.txt中，如果是在子目录下，
 file(GLOB native_srcs_dy "${CMAKE_SOURCE_DIR}/src/main/cpp/*.cpp")
 file(GLOB native_srcs_singleton "${CMAKE_SOURCE_DIR}/src/main/cpp/Singleton/*.cpp")
+file(GLOB native_srcs_play "${CMAKE_SOURCE_DIR}/src/main/cpp/play/*.cpp")
 file(GLOB ffmpeg_srcs "${CMAKE_SOURCE_DIR}/src/main/cpp/*.c")
 
 # Creates and names a library, sets it as either STATIC
@@ -48,7 +49,9 @@ add_library(
 
         ${native_srcs_dy}
         ${native_srcs_singleton}
+        ${native_srcs_play}
         ${ffmpeg_srcs})
+
 
 # CMAKE_SOURCE_DIR CMAKE_SOURCE_DIR 表示CMakeLists.txt所在文件的根目录，如当前的根目录是app文件夹；
 #设置头文件目录

@@ -45,9 +45,11 @@ JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接�
 
 3）视频播放：
 https://www.jianshu.com/p/c7de148e951c
-https://www.jianshu.com/p/c7de148e951c
+
 
 4）视频转码
+
+5)音视频开发使用OpenSL ES https://blog.51cto.com/ticktick/1764778
 
 
 

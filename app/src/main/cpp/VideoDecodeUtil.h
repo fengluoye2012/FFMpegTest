@@ -68,17 +68,27 @@ void videoDecode(const char *input, const char *output);
 void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface);
 
 /**
- * 使用FFmpeg 播放音频
+ * 使用FFmpeg 配合 AudioTrack 播放音频
  * @param jniEnv
  * @param input
  */
-void audioPlay(JNIEnv *jniEnv,jobject jobj, const char *input);
+void audioPlay(JNIEnv *jniEnv, jobject jobj, const char *input);
 
 bool getAudioIndex();
 
 void audioPrepareReadFrame();
 
-void readAudioFrame(JNIEnv *jniEnv,jobject jobj);
+void readAudioFrame(JNIEnv *jniEnv, jobject jobj);
+
+/**
+ * FFmpeg 配合 OpenGL ES 播放音频
+ * @param jniEnv
+ * @param jobj
+ * @param input
+ */
+void audioPlayOpenSL(JNIEnv *jniEnv, jobject jobj, const char *input);
+
+void createEngine();
 
 
 

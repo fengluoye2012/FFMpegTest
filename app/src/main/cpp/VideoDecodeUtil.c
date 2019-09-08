@@ -115,6 +115,52 @@ void audioPlay(JNIEnv *jniEnv, jobject jobj, const char *input) {
 
 }
 
+
+/**
+ * FFmpeg 配合 OpenSL 播放音乐
+ *
+ * 利用 Android 提供的 AudioRecord 采集音频，利用 AudioTrack 播放音频，利用 MediaCodec 来编解码，这些 API 均是
+ * Android 提供的 Java 层 API，无论是采集、播放还是编解码，这些 API 接口都需要将音频数据从 Java 拷贝到 native 层，
+ * 或者从 native 层拷贝到 Java，
+ *
+ * 如果希望减少拷贝，开发更加高效的 Android 音频应用，则建议使用 Android NDK 提供的 OpenSL ES API 接口，
+ * 它支持在 native 层直接处理音频数据。
+ * @param jniEnv
+ * @param jobj
+ * @param input
+ */
+void audioPlayOpenSL(JNIEnv *jniEnv, jobject jobj, const char *input) {
+
+    LOGE(TAG, "%s", "播放音频文件")
+
+    createEngine();
+
+    ffmpegRegister();
+    if (!getStreamInfo(input)) {
+        return;
+    }
+
+    if (!getAudioIndex()) {
+        return;
+    }
+
+    if (!getAVCodec()) {
+        return;
+    }
+
+    if (!openAvCodec()) {
+        return;
+    }
+
+    audioPrepareReadFrame();
+
+    readAudioFrame(jniEnv, jobj);
+
+}
+
+void createEngine() {
+}
+
 //avcodec_decode_audio4()  已废弃  使用avcodec_send_packet() and avcodec_receive_frame()
 void readAudioFrame(JNIEnv *jniEnv, jobject jobj) {
     //获取通道数
@@ -648,15 +694,3 @@ void releaseResource() {
     avcodec_free_context(&avCodecContext);
     avformat_free_context(avFormatContext);
 }
-
-
-
-
-
-
-
-
-
-
-
-

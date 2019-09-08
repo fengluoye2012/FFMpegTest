@@ -60,9 +60,11 @@ public class JNIDynamicUtils {
 
     public native void singleton();
 
-
     public native void playAudio(String inPath);
 
+    public native void playAudioOpenSL(String inPath);
+
+    public native void stopAuidoOpenSL();
 
     //这个方法  是C进行调用
     public void createTrack(int sampleRateInHz, int nb_channals) {

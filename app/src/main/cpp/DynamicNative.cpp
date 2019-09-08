@@ -16,6 +16,8 @@
 #include "Singleton/SingletonTest.h"
 #include "Singleton/SingletonTest1.h"
 #include "CPlusLogUtil.h"
+#include "OpenSLESPlayMusic.h"
+#include "play/OpenSLESPlayMusic.h"
 
 //引用C的头文件
 extern "C" {
@@ -33,6 +35,7 @@ using std::string;
 JavaVM *javaVM;
 jobject obj;
 // Android log function wrappers
+OpenSLESPlayMusic *openSLESPlayMusic;
 
 //C++ 层代码
 jstring native_hello(JNIEnv *env, jobject obj) {
@@ -264,6 +267,22 @@ void native_ffmpeg_play_audio(JNIEnv *env, jobject jobj, jstring inPath) {
     env->ReleaseStringUTFChars(inPath, in_path);
 }
 
+void native_ffmpeg_play_audio_openSL(JNIEnv *env, jobject jobj, jstring inPath) {
+    const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
+
+    OpenSLESPlayMusic *openSLESPlayMusic = new OpenSLESPlayMusic();
+    openSLESPlayMusic->playMusic(in_path);
+
+    //释放字符
+    env->ReleaseStringUTFChars(inPath, in_path);
+}
+
+void native_ffmpeg_stop_audio_openSL(JNIEnv *env, jobject jobj) {
+    if (openSLESPlayMusic != NULL) {
+        openSLESPlayMusic->releaseResource();
+    }
+}
+
 void native_mp4ToFlv(JNIEnv *env, jobject jobj, jstring inPath, jstring outPath) {
     const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
     const char *out_path = env->GetStringUTFChars(outPath, JNI_FALSE);
@@ -322,7 +341,9 @@ static JNINativeMethod gMethods[] = {
         {"mp4ToFlv",                    "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_mp4ToFlv},
         {"mp4ToM3U8",                   "(Ljava/lang/String;Ljava/lang/String;)V",     (void *) native_mp4ToM3U8},
         {"singleton",                   "()V",                                         (void *) native_singleton},
-        {"playAudio",                   "(Ljava/lang/String;)V",                       (void *) native_ffmpeg_play_audio}
+        {"playAudio",                   "(Ljava/lang/String;)V",                       (void *) native_ffmpeg_play_audio},
+        {"playAudioOpenSL",             "(Ljava/lang/String;)V",                       (void *) native_ffmpeg_play_audio_openSL},
+        {"stopAuidoOpenSL",             "()V",                                         (void *) native_ffmpeg_stop_audio_openSL}
 };
 
 //System.loadLibrary过程会自动调用JNI_OnLoad,在此动态注册；
