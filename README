@@ -43,16 +43,13 @@ JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接�
 
 2）视频转码并保存：https://blog.csdn.net/ethanco/article/details/83447554
 
-3）视频播放：
-https://www.jianshu.com/p/c7de148e951c
+3）音视频播放和录制：
+3.1)https://www.jianshu.com/p/c7de148e951c
+3.2)音视频开发使用OpenSL ES https://blog.51cto.com/ticktick/1764778
+3.3)音频采集：Android基于OpenSL ES的实现 https://www.jianshu.com/p/0cb2ba3171b8
 
 
 4）视频转码
-
-5)音视频开发使用OpenSL ES https://blog.51cto.com/ticktick/1764778
-
-
-
 在FFmpeg中，mux指复用，是multiplex的缩写，表示将多路流(视频、音频、字幕等)混入一路输出中(普通文件、流等)。
 demux指解复用，是mux的反操作，表示从一路输入中分离出多路流(视频、音频、字幕等)。mux处理的是输入格式，demux处理的输出格式。
 FFmpeg封装格式处理 https://www.cnblogs.com/leisure_chn/p/10506636.html
