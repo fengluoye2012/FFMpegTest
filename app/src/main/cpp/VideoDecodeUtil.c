@@ -19,7 +19,7 @@
 
 void videoDecode(const char *input, const char *output) {
 
-    LOGI(TAG, "%s", "开始转码");
+    LOGI_TAG(TAG, "%s", "开始转码");
 
     //1 注册所有组件
     ffmpegRegister();
@@ -48,7 +48,7 @@ void videoDecode(const char *input, const char *output) {
     readFrame();
 
     releaseResource();
-    LOGI(TAG, "%s", "转码结束");
+    LOGI_TAG(TAG, "%s", "转码结束");
 }
 
 void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface) {
@@ -90,7 +90,7 @@ void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface) {
  * @param input
  */
 void audioPlay(JNIEnv *jniEnv, jobject jobj, const char *input) {
-    LOGE(TAG, "%s", "播放音频文件")
+    LOGE_TAG(TAG, "%s", "播放音频文件")
 
     ffmpegRegister();
     if (!getStreamInfo(input)) {
@@ -131,7 +131,7 @@ void audioPlay(JNIEnv *jniEnv, jobject jobj, const char *input) {
  */
 void audioPlayOpenSL(JNIEnv *jniEnv, jobject jobj, const char *input) {
 
-    LOGE(TAG, "%s", "播放音频文件")
+    LOGE_TAG(TAG, "%s", "播放音频文件")
 
     createEngine();
 
@@ -174,18 +174,18 @@ void readAudioFrame(JNIEnv *jniEnv, jobject jobj) {
 
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
         if (avPacket->stream_index == target_stream_index) {
-            LOGI(TAG, "%s", "解码");
+            LOGI_TAG(TAG, "%s", "解码");
             //解码 mp3  编码格式frame---pcm  frame
             code = avcodec_send_packet(avCodecContext, avPacket);
             if (code < 0) {
-                LOGI(TAG, "%s", "avcodec_send_packet Fail")
+                LOGI_TAG(TAG, "%s", "avcodec_send_packet Fail")
             }
 
             //这个不能改成使用code 判断；
             while (1) {
                 code = avcodec_receive_frame(avCodecContext, avFrame);
                 if (code < 0) {
-                    LOGI(TAG, "%s", "avcodec_receive_frame Fail")
+                    LOGI_TAG(TAG, "%s", "avcodec_receive_frame Fail")
                     break;
                 }
 
@@ -255,7 +255,7 @@ bool getAudioIndex() {
     }
 
     if (target_stream_index > -1) {
-        LOGI(TAG, "找到视频流下标::%d", target_stream_index);
+        LOGI_TAG(TAG, "找到视频流下标::%d", target_stream_index);
         return true;
     }
     return false;
@@ -288,7 +288,7 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
     code = avformat_alloc_output_context2(&outAvFormatContext, NULL, NULL, output);
 
     if (code) {
-        LOGI(TAG, "%s", "avformat_alloc_output_context2 Fail");
+        LOGI_TAG(TAG, "%s", "avformat_alloc_output_context2 Fail");
         return;
     }
 
@@ -301,7 +301,7 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
     stream_mapping = av_mallocz_array((size_t) stream_mapping_size, sizeof(stream_mapping));
 
     if (!stream_mapping) {
-        LOGI(TAG, "%s", "av_mallocz_array fail");
+        LOGI_TAG(TAG, "%s", "av_mallocz_array fail");
         return;
     }
 
@@ -329,7 +329,7 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
 
         code = avcodec_parameters_copy(out_stream->codecpar, in_codecpar);
         if (code < 0) {
-            LOGI(TAG, "%s", "avcodec_parameters_copy Fail");
+            LOGI_TAG(TAG, "%s", "avcodec_parameters_copy Fail");
             return;
         }
 
@@ -341,7 +341,7 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
     if (!(outAvFormatContext->flags & AVFMT_NOFILE)) {
         code = avio_open(&outAvFormatContext->pb, output, AVIO_FLAG_WRITE);
         if (code < 0) {
-            LOGI(TAG, "%s", "avio_open Fail");
+            LOGI_TAG(TAG, "%s", "avio_open Fail");
             return;
         }
     }
@@ -350,13 +350,13 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
     code = avformat_write_header(outAvFormatContext, NULL);
 
     if (code < 0) {
-        LOGI(TAG, "%s", "avformat_write_header Fail");
+        LOGI_TAG(TAG, "%s", "avformat_write_header Fail");
         return;
     }
 
     AVPacket *pkt = av_packet_alloc();
     AVStream *in_stream, *out_stream;
-    LOGE(TAG, "%s", "开始读取Frame");
+    LOGE_TAG(TAG, "%s", "开始读取Frame");
 
     //读取每一帧
     while (av_read_frame(avFormatContext, pkt) >= 0) {
@@ -383,13 +383,13 @@ void mp4Toflv(JNIEnv *jniEnv, const char *input, const char *output) {
         code = av_interleaved_write_frame(outAvFormatContext, pkt);
 
         if (code < 0) {
-            LOGI(TAG, "%s", "av_interleaved_write_frame Fail");
+            LOGI_TAG(TAG, "%s", "av_interleaved_write_frame Fail");
             break;
         }
 
         av_packet_unref(pkt);
     }
-    LOGE(TAG, "%s", "读取完成");
+    LOGE_TAG(TAG, "%s", "读取完成");
 
     av_write_trailer(outAvFormatContext);
     //释放资源
@@ -430,11 +430,11 @@ void playReadFrame() {
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
         if (avPacket->stream_index == target_stream_index) {
 
-            LOGI(TAG, "%s", "解码");
+            LOGI_TAG(TAG, "%s", "解码");
             avcodec_send_packet(avCodecContext, avPacket);
 
             if (code < 0) {
-                LOGI(TAG, "%s :: %d", "avcodec_send_packet 失败", code);
+                LOGI_TAG(TAG, "%s :: %d", "avcodec_send_packet 失败", code);
             }
 
             //这个不能改成使用code 判断；
@@ -485,7 +485,7 @@ void playReadFrame() {
 void getANativeWindow(JNIEnv *jniEnv, jobject surface) {
     aNativeWindow = ANativeWindow_fromSurface(jniEnv, surface);
     if (aNativeWindow == NULL) {
-        LOGE(TAG, "%s", "ANativeWindow 为null");
+        LOGE_TAG(TAG, "%s", "ANativeWindow 为null");
         return;
     }
 }
@@ -503,7 +503,7 @@ bool getStreamInfo(const char *input) {
     code = avformat_open_input(&avFormatContext, input, NULL, NULL);
 
     if (code < 0) {
-        LOGI(TAG, "%s", "无法打开视频文件");
+        LOGI_TAG(TAG, "%s", "无法打开视频文件");
         return false;
     }
 
@@ -511,7 +511,7 @@ bool getStreamInfo(const char *input) {
     code = avformat_find_stream_info(avFormatContext, NULL);
 
     if (code < 0) {
-        LOGI(TAG, "%s", "无法获取视频信息");
+        LOGI_TAG(TAG, "%s", "无法获取视频信息");
         return false;
     }
 
@@ -537,11 +537,11 @@ bool getVideoIndex() {
     }
 
     if (target_stream_index == -1) {
-        LOGI(TAG, "%s", "找不到视频流")
+        LOGI_TAG(TAG, "%s", "找不到视频流")
         return false;
     }
 
-    LOGI(TAG, "找到了视频流::%d", target_stream_index);
+    LOGI_TAG(TAG, "找到了视频流::%d", target_stream_index);
 
     return true;
 }
@@ -555,7 +555,7 @@ bool getAVCodec() {
     avCodec = avcodec_find_decoder(avCodecParameters->codec_id);
 
     if (avCodec == NULL) {
-        LOGI(TAG, "%s", "找不到解码器");
+        LOGI_TAG(TAG, "%s", "找不到解码器");
         return false;
     }
 
@@ -564,7 +564,7 @@ bool getAVCodec() {
 
     code = avcodec_parameters_to_context(avCodecContext, avCodecParameters);
     if (code < 0) {
-        LOGI(TAG, "%s", "avcodec_parameters_to_context Fail")
+        LOGI_TAG(TAG, "%s", "avcodec_parameters_to_context Fail")
         return false;
     }
     return true;
@@ -575,7 +575,7 @@ bool openAvCodec() {
     code = avcodec_open2(avCodecContext, avCodec, NULL);
 
     if (code < 0) {
-        LOGI(TAG, "%s", "解码器无法打开");
+        LOGI_TAG(TAG, "%s", "解码器无法打开");
         return false;
     }
 
@@ -585,13 +585,13 @@ bool openAvCodec() {
     //输出视频信息
     srcWidth = avCodecParameters->width;
     srcHeight = avCodecParameters->height;
-    LOGI(TAG, "视频文件格式：%d,%d", srcWidth, srcHeight);
+    LOGI_TAG(TAG, "视频文件格式：%d,%d", srcWidth, srcHeight);
 
 
-    LOGI(TAG, "视频文件名：%s", avFormatContext->filename);
-    LOGI(TAG, "视频文件格式：%s", avFormatContext->iformat->name);
-    LOGI(TAG, "视频时长：%lld", dura / 1000000);
-    LOGI(TAG, "解码器名称：%s", avCodec->name);
+    LOGI_TAG(TAG, "视频文件名：%s", avFormatContext->filename);
+    LOGI_TAG(TAG, "视频文件格式：%s", avFormatContext->iformat->name);
+    LOGI_TAG(TAG, "视频时长：%lld", dura / 1000000);
+    LOGI_TAG(TAG, "解码器名称：%s", avCodec->name);
 
     return true;
 }
@@ -605,7 +605,7 @@ void prepareReadFrame(enum AVPixelFormat aVPixelFormat) {
 
     avPacket = av_packet_alloc();
     if (avPacket == NULL) {
-        LOGI(TAG, "%s", "avPacket 不能为空")
+        LOGI_TAG(TAG, "%s", "avPacket 不能为空")
         return;
     }
 
@@ -640,7 +640,7 @@ void readFrame() {
     int frame_count = 0;
     //6 一帧一帧的读取压缩数据 成功返回0，否则小于0
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
-        LOGI(TAG, "解码第%d帧", frame_count);
+        LOGI_TAG(TAG, "解码第%d帧", frame_count);
 
         //只压缩视频流数据（根据流的索引位置判断）
         if (avPacket->stream_index == target_stream_index) {
@@ -648,7 +648,7 @@ void readFrame() {
             code = avcodec_send_packet(avCodecContext, avPacket);
             av_packet_unref(avPacket);
             if (code < 0) {
-                LOGI(TAG, "%s :: %d", "avcodec_send_packet 失败", code);
+                LOGI_TAG(TAG, "%s :: %d", "avcodec_send_packet 失败", code);
             }
 
             //这个不能改成使用code 判断；

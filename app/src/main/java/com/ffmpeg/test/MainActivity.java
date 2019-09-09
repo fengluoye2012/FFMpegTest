@@ -52,15 +52,17 @@ public class MainActivity extends AppCompatActivity {
 
                                     String outFlvPath = "/storage/emulated/0/DCIM/Camera/flv_type.flv";
 
+                                    String networkUrl = "http://dev.cdlianmeng.com/llQXenrPbCvvSiwHpr3QZtfWrKQt";
+
                                     //FFmpegTest.videoDecode(inPath, outPath);
                                     //JNIDynamicUtils.getInstance().videoDecode(inPath, outPath);
-                                    //videoView.play(outFlvPath);
+                                    videoView.play(networkUrl);
 
                                     //JNIDynamicUtils.getInstance().mp4ToFlv(inPath, outFlvPath);
                                     //JNIDynamicUtils.getInstance().singleton();
 
-                                    String inPathAudio = "/storage/emulated/0/netease/cloudmusic/Music/千陵安浅 - 归去来兮（原调版）（Cover：叶炫清）.mp3";
-                                    JNIDynamicUtils.getInstance().playAudio(inPathAudio);
+                                    //String inPathAudio = "/storage/emulated/0/netease/cloudmusic/Music/千陵安浅 - 归去来兮（原调版）（Cover：叶炫清）.mp3";
+                                    //JNIDynamicUtils.getInstance().playAudio(inPathAudio);
                                 } else {
                                     Toast.makeText(act, "请打开权限", Toast.LENGTH_SHORT).show();
                                 }

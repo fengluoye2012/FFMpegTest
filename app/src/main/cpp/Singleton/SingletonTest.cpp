@@ -8,5 +8,5 @@
 
 
 void SingletonTest::printStr() {
-    LOGE("%s", "c++  饿汉式 单利模式");
+    LOGE_TAG("%s", "c++  饿汉式 单利模式");
 }

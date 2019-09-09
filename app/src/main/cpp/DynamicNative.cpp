@@ -13,6 +13,7 @@
 #include "android/log.h"
 #include "thread"
 #include "tgmath.h"
+#include "play/FFmpegVideoPlay.h"
 #include "Singleton/SingletonTest.h"
 #include "Singleton/SingletonTest1.h"
 #include "CPlusLogUtil.h"
@@ -39,8 +40,8 @@ OpenSLESPlayMusic *openSLESPlayMusic;
 //C++ 层代码
 jstring native_hello(JNIEnv *env, jobject obj) {
     string str = avcodec_configuration();
-    LOGE(kTAG, "C++  avcodec_configuration::%s", str.c_str());
-    LOGI("%s", str.c_str());
+    LOGE_TAG(kTAG, "C++  avcodec_configuration::%s", str.c_str());
+    LOGI_TAG("%s", str.c_str());
     return env->NewStringUTF(str.c_str());
 //    return env->NewStringUTF("Dynamic Hello World");
 }
@@ -109,7 +110,7 @@ void *thread_01(const string name) {
 
     const int count = 10;
     for (int i = 0; i < count; i++) {
-        LOGI("%s：：%d", name.c_str(), i);
+        LOGI_TAG("%s：：%d", name.c_str(), i);
         callJavaMethod(jniEnv, obj, methodId);
         sleep(1);//秒数
         //usleep(1000);//毫秒数
@@ -161,7 +162,7 @@ void *thread_callback(void *cha) {
 
     const int count = 10;
     for (int i = 0; i < count; i++) {
-        LOGI("%s：：%d", name, i);
+        LOGI_TAG("%s：：%d", name, i);
         callJavaMethod(jniEnv, obj, methodId);
         sleep(1);//秒数
         //usleep(1000);//毫秒数
@@ -225,7 +226,7 @@ jstring native_call_static_method(JNIEnv *env, jobject jobj) {
     jstring jstr = env->NewStringUTF(str.c_str());
     env->CallStaticVoidMethod(cls, method_id_static, jstr);
 
-    LOGI("Android Version - %s", "静态方法被调用");
+    LOGI_TAG("Android Version - %s", "静态方法被调用");
 
     threadTest(env, jobj);
 
@@ -249,7 +250,9 @@ void native_videoDecode(JNIEnv *env, jobject jobj, jstring inPath, jstring outPa
  */
 void native_ffmpeg_play(JNIEnv *env, jobject jobj, jstring inPath, jobject surface) {
     const char *in_path = env->GetStringUTFChars(inPath, JNI_FALSE);
-    videoPlay(env, in_path, surface);
+    //videoPlay(env, in_path, surface);
+    FFmpegVIdeoPlay *fFmpegVIdeoPlay = new FFmpegVIdeoPlay();
+    fFmpegVIdeoPlay->videoPlay(env, in_path, surface);
     env->ReleaseStringUTFChars(inPath, in_path);
 }
 
@@ -304,9 +307,9 @@ void native_singleton(JNIEnv *env, jobject jobj) {
 
     //饿汉式
     if (SingletonTest::getInstance() == SingletonTest::getInstance()) {
-        LOGE("%s", "懒汉式 单利");
+        LOGE_TAG("%s", "懒汉式 单利");
     } else {
-        LOGE("%s", "创建了多个实例对象");
+        LOGE_TAG("%s", "创建了多个实例对象");
     }
     SingletonTest::getInstance()->printStr();
 
@@ -315,9 +318,9 @@ void native_singleton(JNIEnv *env, jobject jobj) {
     SingletonTest1::instance->printStr();
 
     if (SingletonTest1::getInstance() == SingletonTest1::instance) {
-        LOGE("%s", "饿汉式 单利");
+        LOGE_TAG("%s", "饿汉式 单利");
     } else {
-        LOGE("%s", "创建了多个实例对象");
+        LOGE_TAG("%s", "创建了多个实例对象");
     }
 
 }

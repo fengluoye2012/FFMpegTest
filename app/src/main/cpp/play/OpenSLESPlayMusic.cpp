@@ -67,7 +67,7 @@ void OpenSLESPlayMusic::createPlayer(const char *input) {
     fFmpegMusic = new FFmpegMusic();
     fFmpegMusic->createFFmpeg(input, &rate, &channels);
 
-    LOGI("rate::%d,,channels::%d", rate, channels);
+    LOGI_TAG("rate::%d,,channels::%d", rate, channels);
 
     /*
      * typedef struct SLDataLocator_AndroidBufferQueue_ {
@@ -107,12 +107,12 @@ void OpenSLESPlayMusic::createPlayer(const char *input) {
 
     const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND, SL_IID_VOLUME};
     const SLboolean req[3] = {SL_BOOLEAN_FALSE, SL_BOOLEAN_FALSE, SL_BOOLEAN_FALSE};
-    LOGI("%s", "执行到此处");
+    LOGI_TAG("%s", "执行到此处");
 
     (*engineEngine)->CreateAudioPlayer(engineEngine, &audioPlayer, &dataSource, &slDataSink, 3, ids,
                                        req);
     (*audioPlayer)->Realize(audioPlayer, SL_BOOLEAN_FALSE);
-    LOGI("%s", "执行到此处2");
+    LOGI_TAG("%s", "执行到此处2");
 
     //初始化播放器
     (*audioPlayer)->GetInterface(audioPlayer, SL_IID_PLAY, &slPlayItf);

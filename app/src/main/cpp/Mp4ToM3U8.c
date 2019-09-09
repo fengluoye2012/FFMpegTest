@@ -57,7 +57,7 @@
 //                }
 //                AVFrame *outAVFrame = av_frame_alloc();
 //                if (0 != transSample(avFrame, outAVFrame, stream_index)) {
-//                    LOGI(TAG, "%s", "转换音频失败");
+//                    LOGI_TAG(TAG, "%s", "转换音频失败");
 //                    code = -1;
 //                }
 //                code = encode_write_frame(outAVFrame, stream_index, NULL);
@@ -104,7 +104,7 @@
 //    code = avformat_open_input(&avFormatContext, input, NULL, NULL);
 //
 //    if (code < 0) {
-//        LOGI(TAG, "%s", "无法打开视频文件");
+//        LOGI_TAG(TAG, "%s", "无法打开视频文件");
 //        return false;
 //    }
 //
@@ -112,7 +112,7 @@
 //    code = avformat_find_stream_info(avFormatContext, NULL);
 //
 //    if (code < 0) {
-//        LOGI(TAG, "%s", "无法获取视频信息");
+//        LOGI_TAG(TAG, "%s", "无法获取视频信息");
 //        return false;
 //    }
 //
@@ -128,7 +128,7 @@
 //        if (avMediaType == AVMEDIA_TYPE_VIDEO || avMediaType == AVMEDIA_TYPE_AUDIO) {
 //            code = avcodec_open2(avCodecContext, avCodec, NULL);
 //            if (code < 0) {
-//                LOGI(TAG, "%s", "无法打开输入流");
+//                LOGI_TAG(TAG, "%s", "无法打开输入流");
 //                return false;
 //            }
 //        }
@@ -146,7 +146,7 @@
 //    avformat_alloc_output_context2(&outAVFormatContext, NULL, "hls", output);
 //
 //    if (outAVFormatContext == NULL) {
-//        LOGI(TAG, "%s", "无法创建 outAVFormatContext ")
+//        LOGI_TAG(TAG, "%s", "无法创建 outAVFormatContext ")
 //        return false;
 //    }
 //
@@ -169,7 +169,7 @@
 //        if (inAvCodecContext->codec_type == AVMEDIA_TYPE_VIDEO) {
 //            encoder = avcodec_find_decoder(AV_CODEC_ID_H264);
 //            if (encoder == NULL) {
-//                LOGI(TAG, "%s", "encoder 无法获取")
+//                LOGI_TAG(TAG, "%s", "encoder 无法获取")
 //                return false;
 //            }
 //
@@ -188,14 +188,14 @@
 //
 //            code = avcodec_open2(outAvCodecContext, encoder, NULL);
 //            if (code < 0) {
-//                LOGI(TAG, "%s", "无法打开 encoder 流");
+//                LOGI_TAG(TAG, "%s", "无法打开 encoder 流");
 //                return false;
 //            }
 //            av_opt_set(outAVFormatContext->priv_data, "preset", "superfast", 0);
 //            av_opt_set(outAVFormatContext->priv_data, "true", "zerolatency", 0);
 //
 //        } else if (inAvCodecContext->codec_type == AVMEDIA_TYPE_UNKNOWN) {
-//            LOGI(TAG, "%s", "AVMEDIA_TYPE_UNKNOWN");
+//            LOGI_TAG(TAG, "%s", "AVMEDIA_TYPE_UNKNOWN");
 //            return false;
 //        } else if (inAvCodecContext->codec_type == AVMEDIA_TYPE_AUDIO) {
 //            encoder = avcodec_find_decoder(AV_CODEC_ID_AAC);
@@ -208,7 +208,7 @@
 //
 //            code = avcodec_open2(outAvCodecContext, encoder, NULL);
 //            if (code < 0) {
-//                LOGI(TAG, "%s", "无法打开音频 encode")
+//                LOGI_TAG(TAG, "%s", "无法打开音频 encode")
 //                return false;
 //            }
 //        } else {
@@ -228,13 +228,13 @@
 //    code = avio_open(&outAVFormatContext->pb, output, AVIO_FLAG_WRITE);
 //
 //    if (code < 0) {
-//        LOGI(TAG, "%s", "无法打开输入文件")
+//        LOGI_TAG(TAG, "%s", "无法打开输入文件")
 //        return false;
 //    }
 //
 //    code = avformat_write_header(outAVFormatContext, NULL);
 //    if (code < 0) {
-//        LOGI(TAG, "%s", "写入头文件失败")
+//        LOGI_TAG(TAG, "%s", "写入头文件失败")
 //        return false;
 //    }
 //

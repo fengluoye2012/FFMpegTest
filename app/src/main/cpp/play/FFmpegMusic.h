@@ -8,11 +8,12 @@ extern "C" {
 #ifndef FFMPEGTEST_FFMPEGMUSIC_H
 #define FFMPEGTEST_FFMPEGMUSIC_H
 
-#endif //FFMPEGTEST_FFMPEGMUSIC_H
-
 //声明全局变量
 #pragma once   //防止重复加载
-//static const char *kTAG = "FFmpegMusic";
+
+#endif //FFMPEGTEST_FFMPEGMUSIC_H
+
+
 
 class FFmpegMusic {
 

@@ -20,13 +20,13 @@ void FFmpegMusic::createFFmpeg(const char *input, int *rate, int *channel) {
     code = avformat_open_input(&avFormatContext, input, NULL, NULL);
 
     if (code < 0) {
-        LOGI("%s", "无法打开音频");
+        LOGI_TAG("%s", "无法打开音频");
         return;
     }
 
     code = avformat_find_stream_info(avFormatContext, NULL);
     if (code < 0) {
-        LOGI("%s", "无法打开视频");
+        LOGI_TAG("%s", "无法打开视频");
         return;
     }
 
@@ -38,7 +38,7 @@ void FFmpegMusic::createFFmpeg(const char *input, int *rate, int *channel) {
     }
 
     if (audio_stream_index < 0) {
-        LOGI("%s", "无法获取音频流下标");
+        LOGI_TAG("%s", "无法获取音频流下标");
         return;
     }
 
@@ -47,19 +47,19 @@ void FFmpegMusic::createFFmpeg(const char *input, int *rate, int *channel) {
             avFormatContext->streams[audio_stream_index]->codecpar->codec_id);
 
     if (avCodec == NULL) {
-        LOGI("%s", "无法获视频编码");
+        LOGI_TAG("%s", "无法获视频编码");
         return;
     }
 
     avCodecContext = avcodec_alloc_context3(avCodec);
     if (avCodecContext == NULL) {
-        LOGI("%s", "无法视频编码器上下文");
+        LOGI_TAG("%s", "无法视频编码器上下文");
         return;
     }
 
     code = avcodec_open2(avCodecContext, avCodec, NULL);
     if (code < 0) {
-        LOGI("%s", "");
+        LOGI_TAG("%s", "");
         return;
     }
 
@@ -94,11 +94,11 @@ int FFmpegMusic::getPcm(void **pcm, size_t *pcm_size) {
         if (avPacket->stream_index == audio_stream_index) {
             code = avcodec_send_packet(avCodecContext, avPacket);
             if (code < 0) {
-                LOGI("%s", "avcodec_send_packet Fail");
+                LOGI_TAG("%s", "avcodec_send_packet Fail");
                 while (1) {
                     code = avcodec_receive_packet(avCodecContext, avPacket);
                     if (code < 0) {
-                        LOGI("%s", "avcodec_receive_packet Fail");
+                        LOGI_TAG("%s", "avcodec_receive_packet Fail");
                         break;
                     }
                     swr_convert(swrContext, &out_buffer, 44100 * 2,

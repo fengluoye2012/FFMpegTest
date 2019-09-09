@@ -10,7 +10,9 @@
 #define FFMPEGTEST_SINGLETONTEST_H
 
 // 一些声明语句
-
+//声明全局变量
+#pragma once   //防止重复加载
+static const char *kTAG = "SingletonTest";
 
 
 #endif //FFMPEGTEST_SINGLETONTEST_H
@@ -24,9 +26,7 @@
  * 不会再调用构造函数了，因为之前已经调用过了，你就是用的现成的，就是所谓的饿汉模式
  */
 
-//声明全局变量
-#pragma once   //防止重复加载
-static const char *kTAG = "SingletonTest";
+
 
 class SingletonTest {
 

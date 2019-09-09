@@ -13,7 +13,7 @@ SingletonTest1::SingletonTest1() {
 
 
 void SingletonTest1::printStr() {
-    LOGI("%s", "懒汉式 单利设计模式");
+    LOGI_TAG("%s", "懒汉式 单利设计模式");
 }
 
 //懒汉式单利模式   非线程安全；
