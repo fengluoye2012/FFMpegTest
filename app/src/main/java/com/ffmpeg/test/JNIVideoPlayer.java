@@ -1,5 +1,6 @@
 package com.ffmpeg.test;
 
+
 import android.view.SurfaceView;
 
 public class JNIVideoPlayer {
@@ -30,7 +31,7 @@ public class JNIVideoPlayer {
 
     public native void prepare(String inputStr);
 
-    public native void play(SurfaceView surface);
+    public native void play(SurfaceView surfaceView);
 
     public native int getTotalTime();
 

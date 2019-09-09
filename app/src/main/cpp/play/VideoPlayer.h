@@ -9,6 +9,9 @@
 #endif //FFMPEGTEST_VIDEOPLAYER_H
 
 #include <jni.h>
+#include <android/log.h>
+#include "../CPlusLogUtil.h"
+#include "../Singleton/SingletonTest.h"
 
 
 void native_prepare(JNIEnv *env, jobject obj, jstring inputStr);
@@ -57,6 +60,8 @@ static int registerNativeVideoPlayer(JNIEnv *env) {
     if (cls == NULL) {
         return JNI_FALSE;
     }
+
+    LOGI_TAG("%s", "registerNativeVideoPlayer");
 
     /*
      * 注册方法

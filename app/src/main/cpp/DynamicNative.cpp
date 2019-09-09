@@ -5,7 +5,7 @@
 /**
  * 动态注册Native方法，相比于静态注册，更加灵活，通用；
  */
-
+#include "DynamicNative.h"
 #include <unistd.h>
 #include <iostream>
 #include "jni.h"
@@ -392,9 +392,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *resetved) {
         return result;
     }
 
-//    if (registerNativeVideoPlayer(env) < 1) {
-//        return result;
-//    }
+    if (registerNativeVideoPlayer(env) < 1) {
+        return result;
+    }
 
     result = JNI_VERSION_1_6;
     return result;

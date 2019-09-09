@@ -6,7 +6,7 @@ void native_prepare(JNIEnv *env, jobject obj, jstring inputStr) {
 
 }
 
-void native_play(JNIEnv *env, jobject obj, jobject surface) {
+void native_play(JNIEnv *env, jobject obj,jobject surface) {
 
 }
 
