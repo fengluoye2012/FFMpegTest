@@ -1,6 +1,9 @@
 //
 // Created by wjw on 2019-09-08.
 //
+extern "C" {
+#include <libavformat/avformat.h>
+}
 
 #ifndef FFMPEGTEST_FFMPEGMUSIC_H
 #define FFMPEGTEST_FFMPEGMUSIC_H
@@ -9,9 +12,10 @@
 
 //声明全局变量
 #pragma once   //防止重复加载
-static const char *kTAG = "FFmpegMusic";
+//static const char *kTAG = "FFmpegMusic";
 
 class FFmpegMusic {
+
 public:
     AVFormatContext *avFormatContext;
     int code;
@@ -26,7 +30,7 @@ public:
 
     void createFFmpeg(const char *input, int *rate, int *channel);
 
-    static int getPcm(void **pcm, size_t *pcm_size);
+    int getPcm(void **pcm, size_t *pcm_size);
 
     void releaseFFmpeg();
 };

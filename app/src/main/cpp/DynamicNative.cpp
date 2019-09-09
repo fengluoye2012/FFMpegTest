@@ -16,7 +16,6 @@
 #include "Singleton/SingletonTest.h"
 #include "Singleton/SingletonTest1.h"
 #include "CPlusLogUtil.h"
-#include "OpenSLESPlayMusic.h"
 #include "play/OpenSLESPlayMusic.h"
 
 //引用C的头文件

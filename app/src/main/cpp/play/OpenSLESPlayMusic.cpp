@@ -6,12 +6,10 @@
 #include "OpenSLESPlayMusic.h"
 #include "FFmpegMusic.h"
 #include "../CPlusLogUtil.h"
-
-extern "C" {
+#include "../Singleton/SingletonTest.h"
 #include <unistd.h>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
-}
 
 size_t bufferSize = 0;
 void *buffer;
@@ -20,7 +18,9 @@ void *buffer;
 void getQueueCallBack(SLAndroidSimpleBufferQueueItf slBufferQueueItf, void *context) {
     bufferSize = 0;
 
-    FFmpegMusic::getPcm(&buffer, &bufferSize);
+    FFmpegMusic *fFmpegMusic = new FFmpegMusic();
+    fFmpegMusic->getPcm(&buffer, &bufferSize);
+    //FFmpegMusic::getPcm(&buffer, &bufferSize);
     if (buffer != NULL && bufferSize != 0) {
         //将得到的数据加入到队列中
         (*slBufferQueueItf)->Enqueue(slBufferQueueItf, buffer, bufferSize);

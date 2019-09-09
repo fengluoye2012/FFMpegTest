@@ -12,12 +12,9 @@
 #include "iostream"
 #include "FFmpegMusic.h"
 
-using namespace std;
-using std::string;
-
 class OpenSLESPlayMusic {
 
-private:
+public:
     SLObjectItf engineObject = NULL;//用SLObjectItf声明引擎接口对象
     SLEngineItf engineEngine = NULL;//声明具体的引擎对象
     SLObjectItf outputMixObject = NULL;//用SLObjectItf创建混音器接口对象
@@ -38,7 +35,7 @@ private:
 
     void createPlayer(const char *input);
 
-public:
+
     void playMusic(const char *input);
 
     void releaseResource();

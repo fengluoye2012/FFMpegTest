@@ -2,11 +2,16 @@
 // Created by wjw on 2019-09-08.
 //
 
-#include <libavformat/avformat.h>
 #include <android/log.h>
-#include <libswresample/swresample.h>
 #include "FFmpegMusic.h"
 #include "../CPlusLogUtil.h"
+#include "../Singleton/SingletonTest.h"
+
+extern "C" {
+#include <libavformat/avformat.h>
+#include <libswresample/swresample.h>
+}
+
 
 void FFmpegMusic::createFFmpeg(const char *input, int *rate, int *channel) {
     av_register_all();
@@ -118,7 +123,7 @@ int FFmpegMusic::getPcm(void **pcm, size_t *pcm_size) {
 void FFmpegMusic::releaseFFmpeg() {
     avformat_close_input(&avFormatContext);
     avcodec_free_context(&avCodecContext);
-    av_free_packet(avPacket);
+    // av_free_packet(avPacket);
     av_frame_free(&avFrame);
     swr_free(&swrContext);
     av_free(out_buffer);
