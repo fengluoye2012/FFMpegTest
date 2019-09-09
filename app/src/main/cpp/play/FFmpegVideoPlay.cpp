@@ -140,7 +140,7 @@ bool FFmpegVIdeoPlay::openAvCodec() {
     //输出视频信息
     srcWidth = avCodecParameters->width;
     srcHeight = avCodecParameters->height;
-    LOGI_TAG("视频文件格式：%d,%d", srcWidth, srcHeight);
+    LOGI_TAG("视频宽高：%d,%d", srcWidth, srcHeight);
 
 
     LOGI_TAG("视频文件名：%s", avFormatContext->filename);
@@ -181,8 +181,8 @@ void FFmpegVIdeoPlay::prepareReadFrame(enum AVPixelFormat aVPixelFormat) {
                          srcWidth, srcHeight, 1);
 
     //用于转码 (缩放) 的参数，转之前的宽高，转之后的宽高，格式等
-    sws_ctx = sws_getContext(srcWidth, srcWidth, avCodecContext->pix_fmt,
-                             srcWidth, srcWidth, aVPixelFormat, SWS_BICUBIC,
+    sws_ctx = sws_getContext(srcWidth, srcHeight, avCodecContext->pix_fmt,
+                             srcWidth, srcHeight, aVPixelFormat, SWS_BICUBIC,
                              NULL, NULL, NULL);
 }
 

@@ -18,6 +18,7 @@
 #include "Singleton/SingletonTest1.h"
 #include "CPlusLogUtil.h"
 #include "play/OpenSLESPlayMusic.h"
+#include "play/VideoPlayer.h"
 
 //引用C的头文件
 extern "C" {
@@ -348,6 +349,28 @@ static JNINativeMethod gMethods[] = {
         {"stopAuidoOpenSL",             "()V",                                         (void *) native_ffmpeg_stop_audio_openSL}
 };
 
+int registerNatives(JNIEnv *env) {
+
+    //通过全类名获取jclass对象
+    jclass cls = env->FindClass("com/ffmpeg/test/JNIDynamicUtils");
+    if (cls == NULL) {
+        return JNI_FALSE;
+    }
+
+    //注册方法
+    /**
+     * jclass clazz:
+     * const JNINativeMethod* methods: JNINativeMethod指针
+     * jint nMethods://方法个数
+     */
+    jint j_register = env->RegisterNatives(cls, gMethods, sizeof(gMethods) / sizeof(gMethods[0]));
+    if (j_register < 0) {
+        return JNI_FALSE;
+    }
+
+    return JNI_TRUE;
+}
+
 //System.loadLibrary过程会自动调用JNI_OnLoad,在此动态注册；
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *resetved) {
     JNIEnv *env = NULL;
@@ -364,22 +387,14 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *resetved) {
         return result;
     }
 
-    //通过全类名获取jclass对象
-    jclass cls = env->FindClass("com/ffmpeg/test/JNIDynamicUtils");
-    if (cls == NULL) {
+    //多个类的native动态注册
+    if (registerNatives(env) < 1) {
         return result;
     }
 
-    //注册方法
-    /**
-     * jclass clazz:
-     * const JNINativeMethod* methods: JNINativeMethod指针
-     * jint nMethods://方法个数
-     */
-    jint j_register = env->RegisterNatives(cls, gMethods, sizeof(gMethods) / sizeof(gMethods[0]));
-    if (j_register < 0) {
-        return result;
-    }
+//    if (registerNativeVideoPlayer(env) < 1) {
+//        return result;
+//    }
 
     result = JNI_VERSION_1_6;
     return result;

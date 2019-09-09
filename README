@@ -5,7 +5,8 @@ Android 中Java和C、C++通信主要有两种方式
 1）静态注册：通过Java+全类名+方法名,同时.变成/;
 2）动态注册：这种比较灵活，常用，Android系统也是通过这种方式；
 动态注册的方式：https://blog.csdn.net/xiaoyu_93/article/details/52861173
-动态注册 无法打印log;
+
+NDK 静态注册、动态注册：https://blog.csdn.net/cloverjf/article/details/78878814
 
 
 1）、JNIEnv参数解析：https://www.cnblogs.com/lenve/p/4781605.html?utm_source=tuicool&utm_medium=referral
