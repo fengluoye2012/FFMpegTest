@@ -23,6 +23,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDR
 file(GLOB native_srcs_dy "${CMAKE_SOURCE_DIR}/src/main/cpp/*.cpp")
 file(GLOB native_srcs_singleton "${CMAKE_SOURCE_DIR}/src/main/cpp/Singleton/*.cpp")
 file(GLOB native_srcs_play "${CMAKE_SOURCE_DIR}/src/main/cpp/play/*.cpp")
+file(GLOB native_srcs_videoPlay "${CMAKE_SOURCE_DIR}/src/main/cpp/videoPlay/*.cpp")
 file(GLOB ffmpeg_srcs "${CMAKE_SOURCE_DIR}/src/main/cpp/*.c")
 
 # Creates and names a library, sets it as either STATIC
@@ -50,6 +51,7 @@ add_library(
         ${native_srcs_dy}
         ${native_srcs_singleton}
         ${native_srcs_play}
+        ${native_srcs_videoPlay}
         ${ffmpeg_srcs})
 
 

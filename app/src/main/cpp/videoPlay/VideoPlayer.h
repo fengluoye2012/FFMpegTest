@@ -33,6 +33,9 @@ void native_stop(JNIEnv *env, jobject obj);
 void native_release(JNIEnv *env, jobject obj);
 
 
+void init();
+
+
 /**
 * 动态注册，每增加一个native方法，需要在数组中增加一个JNINativeMethod结构体；
 * JNINativeMethod 是结构体
