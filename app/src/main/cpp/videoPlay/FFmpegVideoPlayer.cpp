@@ -1,16 +1,14 @@
-//
 // Created by wjw on 2019-09-10.
 //
 
 #include <android/log.h>
-#include <libavutil/time.h>
 #include "FFmpegVideoPlayer.h"
 #include "../CPlusLogUtil.h"
 #include "../Singleton/SingletonTest.h"
 
 extern "C" {
 #include <libavutil/imgutils.h>
-#include <libswscale/swscale.h>
+#include <libavutil/time.h>
 }
 
 static void (*video_call)(AVFrame *frame);
@@ -38,18 +36,18 @@ void *videoPlay(void *args) {
                                                    NULL, NULL, NULL);
 
     //打印内存地址
-    LOGI_TAG("codec 的内存地址 %f", *fFmpegVideoPlayer->codec);
+    //LOGI_TAG("codec 的内存地址 %f", *fFmpegVideoPlayer->codec);
 
-    double last_play //上一帧的播放时间
+    double last_play = 0 //上一帧的播放时间
     , play  //当前帧的播放时间
-    , last_delay //上一次播放视频的两帧视频间隔时间
+    , last_delay = 0 //上一次播放视频的两帧视频间隔时间
     , delay //两帧视频间隔时间
     , audio_lock //音频轨道 时间播放时间
     , diff //音频帧与视频帧相差时间
-    , syn_threshold
+    , syn_threshold = 0
     , start_time //从第一帧开始的绝对时间
     , pts
-    , actual_delay//真正需要延迟时间
+    , actual_delay = 0//真正需要延迟时间
     ;
 
 
@@ -110,7 +108,7 @@ void *videoPlay(void *args) {
             if (actual_delay < 0.01) {
                 actual_delay = 0.01;
             }
-            av_usleep(actual_delay * 1000000.0 + 6000);
+            av_usleep(static_cast<unsigned int>(actual_delay * 1000000.0 + 6000));
 
             LOGI_TAG("%s", "视频播放");
             video_call(rgbAvFrame);
@@ -149,12 +147,38 @@ void FFmpegVideoPlayer::setAvCodecContext(AVCodecContext *avCodecContext) {
 }
 
 int FFmpegVideoPlayer::put(AVPacket *avPacket) {
+    LOGI_TAG("%s", "video 插入队列");
+    AVPacket *avPacket1 = av_packet_clone(avPacket);
 
-
-    return 0;
+    //push的时候需要锁住，有数据的时候再解锁
+    pthread_mutex_lock(&mutex);
+    queue.push_back(avPacket1);//将avPacket压入队列
+    //压入过后再发出消息并且解锁
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&mutex);
+    return 1;
 }
 
 int FFmpegVideoPlayer::get(AVPacket *avPacket) {
+    LOGI_TAG("%s", "从队列取出Avpacket");
+    pthread_mutex_lock(&mutex);
+    while (isPlay) {
+        if (!queue.empty() && isPause) {
+            //如果队列中有数据可以拿出来
+            if (av_packet_ref(avPacket, queue.front())) {
+                break;
+            }
+            //取成功了，弹出队列，销毁avPacket
+            AVPacket *avPacket1 = queue.front();
+            queue.erase(queue.begin());
+            av_free(avPacket1);
+            break;
+        } else {
+            pthread_cond_wait(&cond, &mutex);
+        }
+    }
+    LOGI_TAG("%s", "解锁");
+    pthread_mutex_unlock(&mutex);
     return 0;
 }
 
@@ -172,17 +196,53 @@ void FFmpegVideoPlayer::play() {
 }
 
 void FFmpegVideoPlayer::stop() {
+    pthread_mutex_lock(&mutex);
+    isPlay = 0;
+    //因为可能卡在queue
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&mutex);
 
+    pthread_join(playId, 0);
+    LOGE_TAG("%s", "Video join pass");
+    if (this->codec) {
+        if (avcodec_is_open(this->codec)) {
+            avcodec_close(this->codec);
+        }
+        avcodec_free_context(&this->codec);
+        this->codec = 0;
+    }
+    LOGE_TAG("%s", "Video close");
 }
 
 void FFmpegVideoPlayer::pause() {
-
+    if (isPause == 1) {
+        isPause = 0;
+    } else {
+        isPause = 1;
+        pthread_cond_signal(&cond);
+    }
 }
 
 double FFmpegVideoPlayer::synchronize(AVFrame *avFrame, double play) {
+    //clock是当前播放的时间位置
+    if (play != 0) {
+        clock = play;
+    } else {
+        //pst 为0，则先把pts设置为上一帧时间
+        play = clock;
+    }
+    //可能有pts为0 则主动增加clock
+    double repeat_pict = avFrame->repeat_pict;
+    //使用AvCodecContext的而不是stream的
+    double frame_deley = av_q2d(codec->time_base);
+    //如果time_base是1，25  把1s分成25份，则fps为25；
+    double fps = 1 / frame_deley;
+    //pts 加上延迟 是显示时间
+    double extra_delay = repeat_pict / (2 * fps);
+    double delay = extra_delay + frame_deley;
+    clock += delay;
 
-
-    return 0;
+    return play;
 }
 
 void FFmpegVideoPlayer::setFFmpegMusic(FFmpegAudioPlayer *fFmpegAudioPlayer) {

@@ -1,4 +1,3 @@
-//
 // Created by 风落叶 on 2019-08-18.
 //
 
@@ -18,7 +17,7 @@
 #include "Singleton/SingletonTest1.h"
 #include "CPlusLogUtil.h"
 #include "play/OpenSLESPlayMusic.h"
-#include "play/VideoPlayer.h"
+#include "videoPlay/VideoPlayer.h"
 
 //引用C的头文件
 extern "C" {

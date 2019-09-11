@@ -10,6 +10,7 @@
 #include <jni.h>
 #include <android/native_window.h>
 #include <libswresample/swresample.h>
+#include <libavformat/avformat.h>
 
 #ifndef FFMPEGTEST_VIDEODECODEUTIL_H
 #define FFMPEGTEST_VIDEODECODEUTIL_H

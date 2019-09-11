@@ -1,8 +1,9 @@
 //
 // Created by wjw on 2019-09-10.
 //
+//#ifdef guards
+#pragma once
 
-#include <libswresample/swresample.h>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 #include "iostream"
@@ -11,8 +12,11 @@
 using namespace std;
 using std::vector;
 
+
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavutil/frame.h>
+#include <libswresample/swresample.h>
 }
 
 
@@ -84,4 +88,4 @@ public:
     SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue;
 
     void createFFmpeg(FFmpegAudioPlayer *pPlayer);
-}
+};

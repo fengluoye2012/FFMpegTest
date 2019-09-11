@@ -1,14 +1,16 @@
-
 #include <jni.h>
 #include <pthread.h>
 #include <android/native_window.h>
-#include <libavutil/time.h>
+
+#include <android/native_window_jni.h>
 #include "VideoPlayer.h"
 #include "FFmpegAudioPlayer.h"
 #include "FFmpegVideoPlayer.h"
 
 extern "C" {
+#include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libavutil/time.h>
 }
 
 const char *in_put;
@@ -19,7 +21,7 @@ pthread_t p_tid;
 int isPlay;
 ANativeWindow *window = NULL;
 int64_t duration;
-AVFormatContext *avFormatContext;
+AVFormatContext *formatContext;
 AVPacket *packet;
 int step = 0;
 jboolean isSeek = JNI_FALSE;
@@ -53,8 +55,8 @@ void call_video_play(AVFrame *frame) {
 void *begin(void *args) {
 
     //找到视频流和音频流
-    for (int i = 0; i < avFormatContext->nb_streams; ++i) {
-        AVCodecParameters *avCodecParameters = avFormatContext->streams[i]->codecpar;
+    for (int i = 0; i < formatContext->nb_streams; ++i) {
+        AVCodecParameters *avCodecParameters = formatContext->streams[i]->codecpar;
 
         //获取解码器
         AVCodec *avCodec = avcodec_find_decoder(avCodecParameters->codec_id);
@@ -69,7 +71,7 @@ void *begin(void *args) {
         if (avCodecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
             fFmpegVideoPlayer->index = i;
             fFmpegVideoPlayer->setAvCodecContext(avCodecContext);
-            fFmpegVideoPlayer->time_base = avFormatContext->streams[i]->time_base;
+            fFmpegVideoPlayer->time_base = formatContext->streams[i]->time_base;
 
             if (window != NULL) {
                 ANativeWindow_setBuffersGeometry(window, avCodecParameters->width,
@@ -82,7 +84,7 @@ void *begin(void *args) {
         if (avCodecParameters->codec_type == AVMEDIA_TYPE_AUDIO) {
             fFmpegAudioPlayer->index = i;
             fFmpegAudioPlayer->setAvCodecContext(avCodecContext);
-            fFmpegAudioPlayer->time_base = avFormatContext->streams[i]->time_base;
+            fFmpegAudioPlayer->time_base = formatContext->streams[i]->time_base;
         }
     }
 
@@ -96,7 +98,7 @@ void *begin(void *args) {
     packet = av_packet_alloc();
     int code;
     while (isPlay) {
-        code = av_read_frame(avFormatContext, packet);
+        code = av_read_frame(formatContext, packet);
         if (code == 0) {
             if (fFmpegVideoPlayer != NULL && fFmpegVideoPlayer->isPlay &&
                 packet->stream_index == fFmpegVideoPlayer->index) {
@@ -130,7 +132,7 @@ void *begin(void *args) {
 
     //释放
     av_packet_free(&packet);
-    avformat_free_context(avFormatContext);
+    avformat_free_context(formatContext);
     //退出线程
     pthread_exit(0);
 }
@@ -162,56 +164,105 @@ void init() {
     avformat_network_init();
 
     //封装格式上下文
-    avFormatContext = avformat_alloc_context();
+    formatContext = avformat_alloc_context();
 
     //2 打开输入视频文件
-    if (avformat_open_input(&avFormatContext, in_put, NULL, NULL) < 0) {
+    if (avformat_open_input(&formatContext, in_put, NULL, NULL) < 0) {
         LOGI_TAG("%s", "无法打开视频文件");
         return;
     }
 
     //3 获取视频信息
-    if (avformat_find_stream_info(avFormatContext, NULL) < 0) {
+    if (avformat_find_stream_info(formatContext, NULL) < 0) {
         LOGI_TAG("%s", "获取视频信息失败");
         return;
     }
 
     //获取播放总时间
-    if (avFormatContext->duration != AV_NOPTS_VALUE) {
-        duration = avFormatContext->duration;//毫秒
+    if (formatContext->duration != AV_NOPTS_VALUE) {
+        duration = formatContext->duration;//毫秒
     }
 }
 
 void native_play(JNIEnv *env, jobject obj, jobject surface) {
-
+    //得到界面
+    if (window != NULL) {
+        ANativeWindow_release(window);
+        window = NULL;
+    }
+    window = ANativeWindow_fromSurface(env, surface);
+    if (fFmpegVideoPlayer != NULL && fFmpegVideoPlayer->codec != NULL) {
+        ANativeWindow_setBuffersGeometry(window, fFmpegVideoPlayer->codec->width,
+                                         fFmpegVideoPlayer->codec->height, WINDOW_FORMAT_RGBA_8888);
+    }
 }
 
+//获取视频总时间
 jint native_getTotalTime(JNIEnv *env, jobject obj) {
-    return 0;
+    return static_cast<jint>(duration);
 }
 
 jdouble native_getCurPos(JNIEnv *env, jobject obj) {
-
-    return 0;
+    return fFmpegVideoPlayer->clock;
 }
 
 void native_seekTo(JNIEnv *env, jobject obj, jint seekPos) {
+    seekTo(seekPos / 1000);
+}
 
+void seekTo(int mesc) {
+    if (mesc <= 0) {
+        mesc = 0;
+    }
+    //清空vector
+    fFmpegAudioPlayer->queue.clear();
+    fFmpegAudioPlayer->queue.clear();
+
+    //跳到某个关键帧
+    av_seek_frame(formatContext, fFmpegVideoPlayer->index,
+                  (int64_t) (mesc / av_q2d(fFmpegVideoPlayer->time_base)), AVSEEK_FLAG_BACKWARD);
+
+    av_seek_frame(formatContext, fFmpegAudioPlayer->index,
+                  (int64_t) (mesc / av_q2d(fFmpegAudioPlayer->time_base)), AVSEEK_FLAG_BACKWARD);
 }
 
 void native_stepUp(JNIEnv *env, jobject obj) {
-
+    //点击快进按钮
+    seekTo(5);
 }
 
 void native_stepBack(JNIEnv *env, jobject obj) {
 
 }
 
+//暂停
 void native_stop(JNIEnv *env, jobject obj) {
-
+    fFmpegAudioPlayer->pause();
+    fFmpegVideoPlayer->pause();
 }
 
+//释放资源
 void native_release(JNIEnv *env, jobject obj) {
+    if (isPlay) {
+        isPlay = 0;
+        pthread_join(p_tid, 0);
+    }
+
+    if (fFmpegVideoPlayer != NULL) {
+        if (fFmpegVideoPlayer->isPlay) {
+            fFmpegVideoPlayer->stop();
+        }
+        delete (fFmpegVideoPlayer);
+        fFmpegVideoPlayer = NULL;
+    }
+
+    if (fFmpegAudioPlayer != NULL) {
+        if (fFmpegAudioPlayer->isPlay) {
+            fFmpegAudioPlayer->stop();
+        }
+        delete (fFmpegAudioPlayer);
+        fFmpegAudioPlayer = NULL;
+    }
 
 }
 

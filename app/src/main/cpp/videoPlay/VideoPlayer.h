@@ -35,6 +35,8 @@ void native_release(JNIEnv *env, jobject obj);
 
 void init();
 
+void seekTo(jint i);
+
 
 /**
 * 动态注册，每增加一个native方法，需要在数组中增加一个JNINativeMethod结构体；

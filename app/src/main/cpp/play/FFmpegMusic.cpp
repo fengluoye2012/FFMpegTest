@@ -1,4 +1,3 @@
-//
 // Created by wjw on 2019-09-08.
 //
 
@@ -89,30 +88,31 @@ void FFmpegMusic::createFFmpeg(const char *input, int *rate, int *channel) {
 
 
 int FFmpegMusic::getPcm(void **pcm, size_t *pcm_size) {
-    int frameCount = 0;
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
         if (avPacket->stream_index == audio_stream_index) {
             code = avcodec_send_packet(avCodecContext, avPacket);
             if (code < 0) {
                 LOGI_TAG("%s", "avcodec_send_packet Fail");
-                while (1) {
-                    code = avcodec_receive_packet(avCodecContext, avPacket);
-                    if (code < 0) {
-                        LOGI_TAG("%s", "avcodec_receive_packet Fail");
-                        break;
-                    }
-                    swr_convert(swrContext, &out_buffer, 44100 * 2,
-                                (const uint8_t **) avFrame->data, avFrame->nb_samples);
+            }
 
-                    //缓冲区大小
-                    int size = av_samples_get_buffer_size(NULL, out_channel_nb, avFrame->nb_samples,
-                                                          AV_SAMPLE_FMT_S16, 1);
-
-                    *pcm = out_buffer;
-                    *pcm_size = static_cast<size_t>(size);
+            while (1) {
+                code = avcodec_receive_packet(avCodecContext, avPacket);
+                if (code < 0) {
+                    LOGI_TAG("%s", "avcodec_receive_packet Fail");
                     break;
                 }
+                swr_convert(swrContext, &out_buffer, 44100 * 2,
+                            (const uint8_t **) avFrame->data, avFrame->nb_samples);
+
+                //缓冲区大小
+                int size = av_samples_get_buffer_size(NULL, out_channel_nb, avFrame->nb_samples,
+                                                      AV_SAMPLE_FMT_S16, 1);
+
+                *pcm = out_buffer;
+                *pcm_size = static_cast<size_t>(size);
+                break;
             }
+
         }
 
     }

@@ -1,21 +1,20 @@
-//
 // Created by wjw on 2019-08-29.
 //
 
 #include <stdio.h>
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
 #include <android/log.h>
-#include <libswscale/swscale.h>
-#include <libavutil/imgutils.h>
 #include <unistd.h>
 #include "VideoDecodeUtil.h"
 #include "CLogUtil.h"
 #include <android/native_window_jni.h>
+
 #include <libavutil/timestamp.h>
 #include <libavutil/frame.h>
 #include <libswresample/swresample.h>
-
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+#include <libavutil/imgutils.h>
 
 void videoDecode(const char *input, const char *output) {
 
