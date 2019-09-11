@@ -1,7 +1,6 @@
 #include <jni.h>
 #include <pthread.h>
 #include <android/native_window.h>
-
 #include <android/native_window_jni.h>
 #include "VideoPlayer.h"
 #include "FFmpegAudioPlayer.h"

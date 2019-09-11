@@ -5,8 +5,6 @@ import android.view.SurfaceView;
 
 public class JNIVideoPlayer {
 
-    private static JNIVideoPlayer instance;
-
     static {
         System.loadLibrary("avcodec");
         System.loadLibrary("avfilter");
@@ -16,6 +14,8 @@ public class JNIVideoPlayer {
         System.loadLibrary("swscale");
         System.loadLibrary("dynamic-native-lib");
     }
+
+    private static JNIVideoPlayer instance;
 
     public static JNIVideoPlayer getInstance() {
         if (instance == null) {
@@ -27,7 +27,6 @@ public class JNIVideoPlayer {
         }
         return instance;
     }
-
 
     public native void prepare(String inputStr);
 
