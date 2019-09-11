@@ -2,6 +2,7 @@ package com.ffmpeg.test;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -39,40 +40,49 @@ public class MainActivity extends AppCompatActivity {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                rxPermissions = new RxPermissions(MainActivity.this);
-                Disposable disposable = rxPermissions
-                        .request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        .subscribe(new Consumer<Boolean>() {
-                            @Override
-                            public void accept(Boolean aBoolean) throws Exception {
-                                if (aBoolean != null && aBoolean) {
-                                    String inPath = "/storage/emulated/0/DCIM/Camera/VID_20190828_174922.mp4";
-                                    String outPath = "/storage/emulated/0/DCIM/Camera/output_1280x720_yuv420p.yuv";
-
-                                    String outFlvPath = "/storage/emulated/0/DCIM/Camera/flv_type.flv";
-
-                                    String networkUrl = "http://dev.cdlianmeng.com/llQXenrPbCvvSiwHpr3QZtfWrKQt";
-
-                                    //FFmpegTest.videoDecode(inPath, outPath);
-                                    //JNIDynamicUtils.getInstance().videoDecode(inPath, outPath);
-                                    videoView.play(networkUrl);
-
-                                    //JNIDynamicUtils.getInstance().mp4ToFlv(inPath, outFlvPath);
-                                    //JNIDynamicUtils.getInstance().singleton();
-
-                                    //String inPathAudio = "/storage/emulated/0/netease/cloudmusic/Music/千陵安浅 - 归去来兮（原调版）（Cover：叶炫清）.mp3";
-                                    //JNIDynamicUtils.getInstance().playAudio(inPathAudio);
-                                } else {
-                                    Toast.makeText(act, "请打开权限", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+                //test();
+                goVideoPlayActivity();
             }
         });
 
         jniFormCPlus();
         jniFormC();
+    }
+
+    private void goVideoPlayActivity() {
+        Intent intent = new Intent(act, VideoActivity.class);
+        startActivity(intent);
+    }
+
+    private void test() {
+        rxPermissions = new RxPermissions(MainActivity.this);
+        Disposable disposable = rxPermissions
+                .request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if (aBoolean != null && aBoolean) {
+                            String inPath = "/storage/emulated/0/DCIM/Camera/VID_20190828_174922.mp4";
+                            String outPath = "/storage/emulated/0/DCIM/Camera/output_1280x720_yuv420p.yuv";
+
+                            String outFlvPath = "/storage/emulated/0/DCIM/Camera/flv_type.flv";
+
+                            String networkUrl = "http://dev.cdlianmeng.com/llQXenrPbCvvSiwHpr3QZtfWrKQt";
+
+                            //FFmpegTest.videoDecode(inPath, outPath);
+                            //JNIDynamicUtils.getInstance().videoDecode(inPath, outPath);
+                            videoView.play(networkUrl);
+
+                            //JNIDynamicUtils.getInstance().mp4ToFlv(inPath, outFlvPath);
+                            //JNIDynamicUtils.getInstance().singleton();
+
+                            //String inPathAudio = "/storage/emulated/0/netease/cloudmusic/Music/千陵安浅 - 归去来兮（原调版）（Cover：叶炫清）.mp3";
+                            //JNIDynamicUtils.getInstance().playAudio(inPathAudio);
+                        } else {
+                            Toast.makeText(act, "请打开权限", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     private void jniFormC() {

@@ -2,8 +2,10 @@ package com.ffmpeg.test;
 
 
 import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
-public class JNIVideoPlayer {
+public class JNIVideoPlayer implements SurfaceHolder.Callback {
 
     static {
         System.loadLibrary("avcodec");
@@ -16,6 +18,10 @@ public class JNIVideoPlayer {
     }
 
     private static JNIVideoPlayer instance;
+    private SurfaceView surfaceView;
+
+    private JNIVideoPlayer() {
+    }
 
     public static JNIVideoPlayer getInstance() {
         if (instance == null) {
@@ -27,6 +33,21 @@ public class JNIVideoPlayer {
         }
         return instance;
     }
+
+    public void setSurfaceView(SurfaceView surfaceView) {
+        this.surfaceView = surfaceView;
+        play(surfaceView.getHolder().getSurface());
+        surfaceView.getHolder().addCallback(this);
+
+    }
+
+    public  void prepareJava(String path) {
+        if (surfaceView == null) {
+            return;
+        }
+        prepare(path);
+    }
+
 
     public native void prepare(String inputStr);
 
@@ -45,4 +66,19 @@ public class JNIVideoPlayer {
     public native void stop();
 
     public native void release();
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        play(holder.getSurface());
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+
+    }
 }
