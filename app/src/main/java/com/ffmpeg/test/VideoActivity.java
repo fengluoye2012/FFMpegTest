@@ -50,7 +50,9 @@ public class VideoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_video);
         surfaceView = findViewById(R.id.surface);
         davidPlayer = JNIVideoPlayer.getInstance();
+
         davidPlayer.setSurfaceView(surfaceView);
+
         mTextView = findViewById(R.id.textview);
         mSeekBar = findViewById(R.id.seekBar);
         mTextCurTime = findViewById(R.id.tvcur);

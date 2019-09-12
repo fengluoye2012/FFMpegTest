@@ -24,14 +24,18 @@ void *videoPlay(void *args) {
 
     int width = fFmpegVideoPlayer->codec->width;
     int height = fFmpegVideoPlayer->codec->height;
-    LOGE_TAG("width::%d，，height::%d", width, height);
+    LOGE_TAG("视频width::%d，，height::%d", width, height);
 
-    //缓存区
+
     int size = av_image_get_buffer_size(AV_PIX_FMT_RGBA, width, height, 1);
-
+    //缓存区
     uint8_t *out_buffer = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(size)));
 
     //与缓存区相关联，设置rgbAvFrame缓存区
+    av_image_fill_arrays(rgbAvFrame->data, rgbAvFrame->linesize, out_buffer, AV_PIX_FMT_RGBA,
+                         width, height, 1);
+
+    LOGE_TAG("%s", "转换成rgba格式");
     fFmpegVideoPlayer->swsContext = sws_getContext(width, height, fFmpegVideoPlayer->codec->pix_fmt,
                                                    width, height, AV_PIX_FMT_RGBA, SWS_BICUBIC,
                                                    NULL, NULL, NULL);
@@ -52,15 +56,15 @@ void *videoPlay(void *args) {
     ;
 
 
-    LOGE_TAG("%s", "从第一帧开始的绝对时间");
     //从第一帧开始的绝对时间
     start_time = av_gettime() / 1000000.0;
 
+    LOGE_TAG("视频准备解码::%d", fFmpegVideoPlayer->isPlay);
     while (fFmpegVideoPlayer->isPlay) {
         fFmpegVideoPlayer->get(avPacket);
-        LOGI_TAG("解码 %d", avPacket->stream_index);
+        LOGI_TAG("视频解码 %d", avPacket->stream_index);
 
-        //avcodec_decode_video2()已过时，使用avcodec_send_packet()和avcodec_receive_frame()替代；
+        //avcodec_decode_video2()//已过时，使用avcodec_send_packet()和avcodec_receive_frame()替代；
         if (avcodec_send_packet(fFmpegVideoPlayer->codec, avPacket) < 0) {
             LOGI_TAG("%s", "avcodec_send_packet fail");
         }
@@ -72,8 +76,9 @@ void *videoPlay(void *args) {
             }
 
             //转换为rgb格式
-            sws_scale(fFmpegVideoPlayer->swsContext, avFrame->data, avFrame->linesize, 0,
-                      avFrame->height, rgbAvFrame->data, rgbAvFrame->linesize);
+            sws_scale(fFmpegVideoPlayer->swsContext, (const uint8_t *const *) avFrame->data,
+                      avFrame->linesize, 0, avFrame->height, rgbAvFrame->data,
+                      rgbAvFrame->linesize);
 
             LOGI_TAG("avFrame 宽%d,,高%d", avFrame->width, avFrame->height);
             LOGI_TAG("rgbAvFrame 宽%d,,高%d", rgbAvFrame->width, rgbAvFrame->height);
@@ -106,16 +111,21 @@ void *videoPlay(void *args) {
             }
 
             start_time += delay;
-            actual_delay = start_time = av_gettime() / 1000000.0;
+            actual_delay = start_time - av_gettime() / 1000000.0;
             if (actual_delay < 0.01) {
                 actual_delay = 0.01;
             }
-            av_usleep(static_cast<unsigned int>(actual_delay * 1000000.0 + 6000));
 
+            LOGI_TAG("actual_delay::%f", actual_delay);
+
+            //参数微秒
+            av_usleep(actual_delay * 1000000.0 + 6000);
             LOGI_TAG("%s", "视频播放");
+
             video_call(rgbAvFrame);
         }
     }
+
     LOGI_TAG("%s", "释放资源");
     av_frame_free(&avFrame);
     av_frame_free(&rgbAvFrame);

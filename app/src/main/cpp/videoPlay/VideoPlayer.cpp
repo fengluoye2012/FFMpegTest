@@ -32,14 +32,15 @@ void call_video_play(AVFrame *frame) {
     }
 
     ANativeWindow_Buffer window_buffer;
-    if (ANativeWindow_lock(window, &window_buffer, 0) > -1) {
+    if (ANativeWindow_lock(window, &window_buffer, 0)) {
         return;
     }
 
     LOGI_TAG("绘制 宽%d,,高%d", frame->width, frame->height);
     LOGI_TAG("绘制宽%d,高%d,行字节%d", window_buffer.width, window_buffer.height, frame->linesize[0]);
 
-    uint8_t *dst = (uint8_t *) (window_buffer.bits);
+    //rgb_frame是有画面数据
+    uint8_t *dst = (uint8_t *) window_buffer.bits;
     int32_t dstStride = window_buffer.stride * 4;
 
     uint8_t *src = frame->data[0];

@@ -33,7 +33,7 @@ int getPcm(FFmpegAudioPlayer *pPlayer) {
             pPlayer->clock = av_q2d(pPlayer->time_base) * avPacket->pts;
         }
 
-        LOGI_TAG("%s", "解码");
+        LOGI_TAG("%s", "音频解码");
         if (avcodec_send_packet(pPlayer->codec, avPacket) < 0) {
             LOGI_TAG("%s", "avcodec_send_packet fail");
         }
