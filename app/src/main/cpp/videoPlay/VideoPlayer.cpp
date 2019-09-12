@@ -61,10 +61,17 @@ void *begin(void *args) {
         AVCodec *avCodec = avcodec_find_decoder(avCodecParameters->codec_id);
 
         AVCodecContext *avCodecContext = avcodec_alloc_context3(avCodec);
+        //关联参数
+        avcodec_parameters_to_context(avCodecContext, avCodecParameters);
+
         if (avcodec_open2(avCodecContext, avCodec, NULL) < 0) {
             LOGI_TAG("%s", "打开失败");
             continue;
         }
+
+        LOGE_TAG("width::%d，height::%d", avCodecContext->width, avCodecContext->height);
+        LOGE_TAG("sample_rate::%d，height::%d", avCodecContext->sample_rate,
+                 avCodecContext->max_b_frames);
 
         //视频流
         if (avCodecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
@@ -137,8 +144,11 @@ void *begin(void *args) {
 }
 
 void native_prepare(JNIEnv *env, jobject obj, jstring inputStr) {
+
     in_put = env->GetStringUTFChars(inputStr, JNI_FALSE);
-    init();
+    if (!init()) {
+        return;
+    }
     fFmpegVideoPlayer = new FFmpegVideoPlayer();
     fFmpegAudioPlayer = new FFmpegAudioPlayer();
 
@@ -156,7 +166,7 @@ void native_prepare(JNIEnv *env, jobject obj, jstring inputStr) {
     env->ReleaseStringUTFChars(inputStr, in_put);
 }
 
-void init() {
+bool init() {
     LOGI_TAG("%s", "开启解码线程");
     //1 注册组件
     av_register_all();
@@ -165,22 +175,29 @@ void init() {
     //封装格式上下文
     formatContext = avformat_alloc_context();
 
+    if (formatContext == NULL) {
+        LOGI_TAG("%s", "formatContext为NULL");
+        return false;
+    }
+
+    LOGI_TAG("输入视频路径::%s", in_put);
     //2 打开输入视频文件
     if (avformat_open_input(&formatContext, in_put, NULL, NULL) < 0) {
         LOGI_TAG("%s", "无法打开视频文件");
-        return;
+        return false;
     }
 
     //3 获取视频信息
     if (avformat_find_stream_info(formatContext, NULL) < 0) {
         LOGI_TAG("%s", "获取视频信息失败");
-        return;
+        return false;
     }
 
     //获取播放总时间
     if (formatContext->duration != AV_NOPTS_VALUE) {
         duration = formatContext->duration;//毫秒
     }
+    return true;
 }
 
 void native_play(JNIEnv *env, jobject obj, jobject surface) {
@@ -189,6 +206,7 @@ void native_play(JNIEnv *env, jobject obj, jobject surface) {
         ANativeWindow_release(window);
         window = NULL;
     }
+
     window = ANativeWindow_fromSurface(env, surface);
     if (fFmpegVideoPlayer != NULL && fFmpegVideoPlayer->codec != NULL) {
         ANativeWindow_setBuffersGeometry(window, fFmpegVideoPlayer->codec->width,

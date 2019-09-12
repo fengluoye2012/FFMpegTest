@@ -13,7 +13,6 @@ extern "C" {
 }
 
 
-
 void *musicPlay(void *args) {
     FFmpegAudioPlayer *fFmpegAudioPlayer = (FFmpegAudioPlayer *) args;
     fFmpegAudioPlayer->createPlayer();
@@ -156,6 +155,7 @@ void FFmpegAudioPlayer::setAvCodecContext(AVCodecContext *avCodecContext) {
 void FFmpegAudioPlayer::play() {
     isPause = 1;
     isPlay = 1;
+    LOGE_TAG("%s", "开启音频播放线程");
     //开启begin线程
     pthread_create(&playId, NULL, musicPlay, this);
 }

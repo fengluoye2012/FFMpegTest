@@ -33,7 +33,7 @@ void native_stop(JNIEnv *env, jobject obj);
 void native_release(JNIEnv *env, jobject obj);
 
 
-void init();
+bool init();
 
 void seekTo(jint i);
 

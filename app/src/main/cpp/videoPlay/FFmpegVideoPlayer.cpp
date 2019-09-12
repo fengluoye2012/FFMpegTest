@@ -24,6 +24,7 @@ void *videoPlay(void *args) {
 
     int width = fFmpegVideoPlayer->codec->width;
     int height = fFmpegVideoPlayer->codec->height;
+    LOGE_TAG("width::%d，，height::%d", width, height);
 
     //缓存区
     int size = av_image_get_buffer_size(AV_PIX_FMT_RGBA, width, height, 1);
@@ -36,7 +37,7 @@ void *videoPlay(void *args) {
                                                    NULL, NULL, NULL);
 
     //打印内存地址
-    //LOGI_TAG("codec 的内存地址 %f", *fFmpegVideoPlayer->codec);
+    LOGI_TAG("codec 的内存地址 %f", *fFmpegVideoPlayer->codec);
 
     double last_play = 0 //上一帧的播放时间
     , play  //当前帧的播放时间
@@ -51,6 +52,7 @@ void *videoPlay(void *args) {
     ;
 
 
+    LOGE_TAG("%s", "从第一帧开始的绝对时间");
     //从第一帧开始的绝对时间
     start_time = av_gettime() / 1000000.0;
 
@@ -183,7 +185,7 @@ int FFmpegVideoPlayer::get(AVPacket *avPacket) {
 }
 
 void FFmpegVideoPlayer::play() {
-    LOGI_TAG("%s", "开启播放线程");
+    LOGI_TAG("%s", "开启视频播放线程");
     LOGI_TAG("ISPAUSE AAAA %d", isPlay);
     if (isPlay == 0) {
         LOGI_TAG("%s", "ssssssssssssssssssss");
