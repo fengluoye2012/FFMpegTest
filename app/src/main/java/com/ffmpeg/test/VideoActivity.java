@@ -50,9 +50,7 @@ public class VideoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_video);
         surfaceView = findViewById(R.id.surface);
         davidPlayer = JNIVideoPlayer.getInstance();
-
         davidPlayer.setSurfaceView(surfaceView);
-
         mTextView = findViewById(R.id.textview);
         mSeekBar = findViewById(R.id.seekBar);
         mTextCurTime = findViewById(R.id.tvcur);
@@ -102,12 +100,12 @@ public class VideoActivity extends AppCompatActivity {
     }
 
     private void playerVideo() {
-         /* File file = new File(Environment.getExternalStorageDirectory(), "input.mp4");
-                            davidPlayer.prepareJava(file.getAbsolutePath());
-                            "http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4"
-                            String url = "http://dev.cdlianmeng.com/llQXenrPbCvvSiwHpr3QZtfWrKQt";*/
+//        File file = new File(Environment.getExternalStorageDirectory(), "input.mp4");
+//        davidPlayer.prepareJava(file.getAbsolutePath());
+//        "http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4"
+        String url = "http://dev.cdlianmeng.com/llQXenrPbCvvSiwHpr3QZtfWrKQt";
 
-        String url = "/storage/emulated/0/DCIM/Camera/VID_20190828_174922.mp4";
+//        String url = "/storage/emulated/0/DCIM/Camera/VID_20190828_174922.mp4";
         davidPlayer.prepareJava(url);
 
         // mTextView.setText(davidPlayer.getTotalTime()+"");
