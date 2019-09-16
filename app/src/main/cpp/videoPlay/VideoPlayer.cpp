@@ -221,8 +221,9 @@ jint native_getTotalTime(JNIEnv *env, jobject obj) {
     return static_cast<jint>(duration);
 }
 
+//视频的播放时间向音频的播放时间对齐；
 jdouble native_getCurPos(JNIEnv *env, jobject obj) {
-    return fFmpegVideoPlayer->clock;
+    return fFmpegAudioPlayer->clock;
 }
 
 void native_seekTo(JNIEnv *env, jobject obj, jint seekPos) {

@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.SeekBar;
@@ -28,6 +29,9 @@ public class VideoActivity extends AppCompatActivity {
     SeekBar mSeekBar;
     boolean isSetProgress = false;
     private static final int HIDE_CONTROL_LAYOUT = -1;
+    private String TAG = VideoActivity.class.getSimpleName();
+
+
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
@@ -153,6 +157,7 @@ public class VideoActivity extends AppCompatActivity {
                     try {
                         Message message = new Message();
                         message.what = (int) davidPlayer.getCurPos() * 1000;
+                        Log.e(TAG, "curPos::" + message.what);
                         handler.sendMessage(message);
                     } catch (Exception e) {
                         e.printStackTrace();

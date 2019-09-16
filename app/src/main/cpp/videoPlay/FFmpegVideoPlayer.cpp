@@ -119,7 +119,7 @@ void *videoPlay(void *args) {
             LOGI_TAG("actual_delay::%f", actual_delay);
 
             //参数微秒
-            av_usleep(actual_delay * 1000000.0 + 6000);
+            av_usleep(static_cast<unsigned int>(actual_delay * 1000000.0 + 6000));
             LOGI_TAG("%s", "视频播放");
 
             video_call(rgbAvFrame);
