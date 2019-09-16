@@ -6,13 +6,12 @@
 #ifndef FFMPEGTEST_VIDEOPLAYER_H
 #define FFMPEGTEST_VIDEOPLAYER_H
 
-#endif //FFMPEGTEST_VIDEOPLAYER_H
-
 #include <jni.h>
 #include <android/log.h>
 #include "../CPlusLogUtil.h"
 #include "../Singleton/SingletonTest.h"
 
+#endif //FFMPEGTEST_VIDEOPLAYER_H
 
 void native_prepare(JNIEnv *env, jobject obj, jstring inputStr);
 

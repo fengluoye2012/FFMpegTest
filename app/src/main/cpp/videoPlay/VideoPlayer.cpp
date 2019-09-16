@@ -27,7 +27,7 @@ jboolean isSeek = JNI_FALSE;
 
 
 void call_video_play(AVFrame *frame) {
-    if (window == NULL) {
+    if (!window) {
         return;
     }
 
@@ -80,10 +80,10 @@ void *begin(void *args) {
             fFmpegVideoPlayer->setAvCodecContext(avCodecContext);
             fFmpegVideoPlayer->time_base = formatContext->streams[i]->time_base;
 
-            if (window != NULL) {
+            if (window) {
                 ANativeWindow_setBuffersGeometry(window, avCodecParameters->width,
                                                  avCodecParameters->height,
-                                                 avCodecParameters->format);
+                                                 WINDOW_FORMAT_RGBA_8888);// avCodecParameters->format
             }
         }
 
@@ -103,6 +103,7 @@ void *begin(void *args) {
 
     //解码packet，并压入队列中
     packet = av_packet_alloc();
+    //跳转到某一特定的帧上面播放
     int code;
     while (isPlay) {
         code = av_read_frame(formatContext, packet);
@@ -122,6 +123,7 @@ void *begin(void *args) {
                 if (fFmpegVideoPlayer->queue.empty() && fFmpegAudioPlayer->queue.empty()) {
                     break;
                 }
+
                 av_usleep(10000);
             }
         }
@@ -163,7 +165,6 @@ void native_prepare(JNIEnv *env, jobject obj, jstring inputStr) {
      * void *arg：这个参数很简单，表示的就是函数指针回调执行函数的参数
      */
     pthread_create(&p_tid, NULL, begin, NULL);
-
     env->ReleaseStringUTFChars(inputStr, in_put);
 }
 
