@@ -6,14 +6,14 @@
 // C 语言的头文件定义  头文件是扩展名为 .h 的文件，包含了 C 函数声明和宏定义，被多个源文件中引用共享。
 // 头文件的声明 https://blog.csdn.net/qq_41912125/article/details/82658046
 
+#ifndef FFMPEGTEST_VIDEODECODEUTIL_H
+#define FFMPEGTEST_VIDEODECODEUTIL_H
+
 #include <stdbool.h>
 #include <jni.h>
 #include <android/native_window.h>
 #include <libswresample/swresample.h>
 #include <libavformat/avformat.h>
-
-#ifndef FFMPEGTEST_VIDEODECODEUTIL_H
-#define FFMPEGTEST_VIDEODECODEUTIL_H
 
 #endif //FFMPEGTEST_VIDEODECODEUTIL_H
 
@@ -90,7 +90,6 @@ void readAudioFrame(JNIEnv *jniEnv, jobject jobj);
 void audioPlayOpenSL(JNIEnv *jniEnv, jobject jobj, const char *input);
 
 void createEngine();
-
 
 
 /**

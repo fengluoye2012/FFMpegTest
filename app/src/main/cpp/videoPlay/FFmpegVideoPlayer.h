@@ -2,6 +2,10 @@
 // Created by wjw on 2019-09-10.
 //
 
+
+#ifndef FFMPEGTEST_FFMPEGVIDEOPLAYER_H
+#define FFMPEGTEST_FFMPEGVIDEOPLAYER_H
+
 #include <vector>
 #include "FFmpegAudioPlayer.h"
 #include "iostream"
@@ -13,9 +17,6 @@ extern "C" {
 
 using namespace std;
 using std::vector;
-
-#ifndef FFMPEGTEST_FFMPEGVIDEOPLAYER_H
-#define FFMPEGTEST_FFMPEGVIDEOPLAYER_H
 
 #endif //FFMPEGTEST_FFMPEGVIDEOPLAYER_H
 

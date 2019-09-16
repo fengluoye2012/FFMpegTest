@@ -5,9 +5,9 @@
 #ifndef FFMPEGTEST_DYNAMICNATIVE_H
 #define FFMPEGTEST_DYNAMICNATIVE_H
 
-#endif //FFMPEGTEST_DYNAMICNATIVE_H
-
 #include "jni.h"
+
+#endif //FFMPEGTEST_DYNAMICNATIVE_H
 
 jstring native_hello(JNIEnv *env, jobject obj);
 

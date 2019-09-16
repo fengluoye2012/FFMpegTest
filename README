@@ -76,6 +76,8 @@ https://blog.csdn.net/yingyemin/article/details/76570576
 三、C、C++的区别
 1）C没有类的概念，也就没有public等访问修饰符，也没有继承等；C不允许使用默认参数，不定长度参数前必须有正常参数，
 2）全局变量，静态变量，变量的区别和使用
+3）预处理 https://www.runoob.com/cprogramming/c-preprocessors.html
+
 
 四、待处理
 1）线程，多线程，线程安全，线程间通信的使用；

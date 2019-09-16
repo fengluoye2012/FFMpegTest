@@ -1,8 +1,13 @@
 //
 // Created by wjw on 2019-09-10.
 //
-//#ifdef guards
+//只加载一次
 #pragma once
+
+//如果宏没有定义，则返回真；
+#ifndef FFMPEGTEST_FFMPEGMUSICPLAYER_H
+//定义宏
+#define FFMPEGTEST_FFMPEGMUSICPLAYER_H
 
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
@@ -19,10 +24,7 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
-
-#ifndef FFMPEGTEST_FFMPEGMUSICPLAYER_H
-#define FFMPEGTEST_FFMPEGMUSICPLAYER_H
-
+//结束语句
 #endif //FFMPEGTEST_FFMPEGMUSICPLAYER_H
 
 class FFmpegAudioPlayer {
