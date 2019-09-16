@@ -70,8 +70,9 @@ void *begin(void *args) {
         }
 
         LOGE_TAG("width::%d，height::%d", avCodecContext->width, avCodecContext->height);
-        LOGE_TAG("sample_rate::%d，height::%d", avCodecContext->sample_rate,
-                 avCodecContext->max_b_frames);
+        //sample_rate 采样率，音频独有
+        LOGE_TAG("采样率：sample_rate::%d，声道数：height::%d", avCodecContext->sample_rate,
+                 avCodecContext->channels);
 
         //视频流
         if (avCodecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {

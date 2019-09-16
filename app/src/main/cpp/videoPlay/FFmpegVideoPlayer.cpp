@@ -41,7 +41,7 @@ void *videoPlay(void *args) {
                                                    NULL, NULL, NULL);
 
     //打印内存地址
-    LOGI_TAG("codec 的内存地址 %f", *fFmpegVideoPlayer->codec);
+    //LOGI_TAG("codec 的内存地址 %f", *fFmpegVideoPlayer->codec);
 
     double last_play = 0 //上一帧的播放时间
     , play  //当前帧的播放时间
