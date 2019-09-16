@@ -13,7 +13,6 @@ extern "C" {
 }
 
 const char *in_put;
-int64_t *totalTime;
 FFmpegVideoPlayer *fFmpegVideoPlayer;
 FFmpegAudioPlayer *fFmpegAudioPlayer;
 pthread_t p_tid;

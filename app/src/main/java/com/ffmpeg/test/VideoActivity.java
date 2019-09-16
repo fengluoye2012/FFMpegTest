@@ -30,7 +30,7 @@ public class VideoActivity extends AppCompatActivity {
     boolean isSetProgress = false;
     private static final int HIDE_CONTROL_LAYOUT = -1;
     private String TAG = VideoActivity.class.getSimpleName();
-
+    private boolean hasStartThread = false;
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
@@ -116,7 +116,11 @@ public class VideoActivity extends AppCompatActivity {
         if (davidPlayer.getTotalTime() != 0) {
             mTextView.setText(formatTime(davidPlayer.getTotalTime() / 1000));
             mSeekBar.setMax(davidPlayer.getTotalTime() / 1000);
-            updateSeekBar();
+
+            if (!hasStartThread) {
+                hasStartThread = true;
+                updateSeekBar();
+            }
         }
     }
 
@@ -149,7 +153,7 @@ public class VideoActivity extends AppCompatActivity {
     }
 
     //更新进度
-    public void updateSeekBar() {
+    private void updateSeekBar() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -157,7 +161,7 @@ public class VideoActivity extends AppCompatActivity {
                     try {
                         Message message = new Message();
                         message.what = (int) davidPlayer.getCurPos() * 1000;
-                        Log.e(TAG, "curPos::" + message.what);
+                        Log.i(TAG, "curPos::" + message.what);
                         handler.sendMessage(message);
                     } catch (Exception e) {
                         e.printStackTrace();

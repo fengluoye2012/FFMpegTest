@@ -11,7 +11,7 @@
 #include "../CPlusLogUtil.h"
 #include "../Singleton/SingletonTest.h"
 
-#endif //FFMPEGTEST_VIDEOPLAYER_H
+#endif FFMPEGTEST_VIDEOPLAYER_H
 
 void native_prepare(JNIEnv *env, jobject obj, jstring inputStr);
 

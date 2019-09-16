@@ -35,6 +35,10 @@ JNIEnv是指向可用JNI函数表的接口指针，原生代码通过JNIEnv接�
 
 6)如何管理第三方C、C++包
 
+7)NDK调试  ndk-stack、addr2line、objdump；
+https://blog.csdn.net/yincp/article/details/41896743
+
+
 
 
 二、FFmpeg的编译和在Android的应用；
