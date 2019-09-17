@@ -21,9 +21,11 @@ ANativeWindow *window = NULL;
 int64_t duration;
 AVFormatContext *formatContext;
 AVPacket *packet;
-int step = 0;
-jboolean isSeek = JNI_FALSE;
 
+/*
+ *  视频播放器播放一个互联网上的视频文件，需要经过以下几个步骤：解协议，解封装，解码视音频，视音频同步。
+ *  如果播放本地文件则不需要解协议，为以下几个步骤：解封装，解码视音频，视音频同步。
+ */
 
 void call_video_play(AVFrame *frame) {
     if (!window) {
@@ -74,6 +76,9 @@ void *begin(void *args) {
         LOGE_TAG("采样率：sample_rate::%d，声道数：height::%d", avCodecContext->sample_rate,
                  avCodecContext->channels);
 
+        LOGE_TAG("format：：%d,WINDOW_FORMAT_RGBA_8888 ==%d", avCodecParameters->format,
+                 WINDOW_FORMAT_RGBA_8888);
+
         //视频流
         if (avCodecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
             fFmpegVideoPlayer->index = i;
@@ -83,7 +88,7 @@ void *begin(void *args) {
             if (window) {
                 ANativeWindow_setBuffersGeometry(window, avCodecParameters->width,
                                                  avCodecParameters->height,
-                                                 WINDOW_FORMAT_RGBA_8888);// avCodecParameters->format
+                                                 WINDOW_FORMAT_RGBA_8888);
             }
         }
 
@@ -172,6 +177,7 @@ bool init() {
     LOGI_TAG("%s", "开启解码线程");
     //1 注册组件
     av_register_all();
+    //网络注册
     avformat_network_init();
 
     //封装格式上下文
@@ -187,6 +193,11 @@ bool init() {
     if (avformat_open_input(&formatContext, in_put, NULL, NULL) < 0) {
         LOGI_TAG("%s", "无法打开视频文件");
         return false;
+    }
+
+    AVDictionaryEntry *tag = NULL;
+    while ((tag = av_dict_get(formatContext->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
+
     }
 
     //3 获取视频信息
