@@ -6,7 +6,11 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-public class VideoView extends SurfaceView {
+/**
+ * 问题：
+ * 1：为什么视频高度和SurfaceView高度一致，而宽度不对？？？
+ */
+public class VideoView extends SurfaceView implements SurfaceHolder.Callback {
 
     private SurfaceHolder holder;
 
@@ -23,6 +27,7 @@ public class VideoView extends SurfaceView {
 
         holder = getHolder();
         holder.setFormat(PixelFormat.RGBA_8888);
+
     }
 
 
@@ -33,5 +38,21 @@ public class VideoView extends SurfaceView {
                 JNIDynamicUtils.getInstance().playVideo(input, holder.getSurface());
             }
         }).start();
+    }
+
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+
     }
 }
