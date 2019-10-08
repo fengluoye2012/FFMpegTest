@@ -13,7 +13,6 @@ extern "C" {
 }
 
 const char *in_put;
-int64_t *totalTime;
 FFmpegVideoPlayer *fFmpegVideoPlayer;
 FFmpegAudioPlayer *fFmpegAudioPlayer;
 pthread_t p_tid;
@@ -22,24 +21,27 @@ ANativeWindow *window = NULL;
 int64_t duration;
 AVFormatContext *formatContext;
 AVPacket *packet;
-int step = 0;
-jboolean isSeek = JNI_FALSE;
 
+/*
+ *  视频播放器播放一个互联网上的视频文件，需要经过以下几个步骤：解协议，解封装，解码视音频，视音频同步。
+ *  如果播放本地文件则不需要解协议，为以下几个步骤：解封装，解码视音频，视音频同步。
+ */
 
 void call_video_play(AVFrame *frame) {
-    if (window == NULL) {
+    if (!window) {
         return;
     }
 
     ANativeWindow_Buffer window_buffer;
-    if (ANativeWindow_lock(window, &window_buffer, 0) > -1) {
+    if (ANativeWindow_lock(window, &window_buffer, 0)) {
         return;
     }
 
     LOGI_TAG("绘制 宽%d,,高%d", frame->width, frame->height);
     LOGI_TAG("绘制宽%d,高%d,行字节%d", window_buffer.width, window_buffer.height, frame->linesize[0]);
 
-    uint8_t *dst = (uint8_t *) (window_buffer.bits);
+    //rgb_frame是有画面数据
+    uint8_t *dst = (uint8_t *) window_buffer.bits;
     int32_t dstStride = window_buffer.stride * 4;
 
     uint8_t *src = frame->data[0];
@@ -61,10 +63,21 @@ void *begin(void *args) {
         AVCodec *avCodec = avcodec_find_decoder(avCodecParameters->codec_id);
 
         AVCodecContext *avCodecContext = avcodec_alloc_context3(avCodec);
+        //关联参数
+        avcodec_parameters_to_context(avCodecContext, avCodecParameters);
+
         if (avcodec_open2(avCodecContext, avCodec, NULL) < 0) {
             LOGI_TAG("%s", "打开失败");
             continue;
         }
+
+        LOGE_TAG("width::%d，height::%d", avCodecContext->width, avCodecContext->height);
+        //sample_rate 采样率，音频独有
+        LOGE_TAG("采样率：sample_rate::%d，声道数：height::%d", avCodecContext->sample_rate,
+                 avCodecContext->channels);
+
+        LOGE_TAG("format：：%d,WINDOW_FORMAT_RGBA_8888 ==%d", avCodecParameters->format,
+                 WINDOW_FORMAT_RGBA_8888);
 
         //视频流
         if (avCodecParameters->codec_type == AVMEDIA_TYPE_VIDEO) {
@@ -72,10 +85,10 @@ void *begin(void *args) {
             fFmpegVideoPlayer->setAvCodecContext(avCodecContext);
             fFmpegVideoPlayer->time_base = formatContext->streams[i]->time_base;
 
-            if (window != NULL) {
+            if (window) {
                 ANativeWindow_setBuffersGeometry(window, avCodecParameters->width,
                                                  avCodecParameters->height,
-                                                 avCodecParameters->format);
+                                                 WINDOW_FORMAT_RGBA_8888);
             }
         }
 
@@ -95,6 +108,7 @@ void *begin(void *args) {
 
     //解码packet，并压入队列中
     packet = av_packet_alloc();
+    //跳转到某一特定的帧上面播放
     int code;
     while (isPlay) {
         code = av_read_frame(formatContext, packet);
@@ -114,6 +128,7 @@ void *begin(void *args) {
                 if (fFmpegVideoPlayer->queue.empty() && fFmpegAudioPlayer->queue.empty()) {
                     break;
                 }
+
                 av_usleep(10000);
             }
         }
@@ -137,8 +152,11 @@ void *begin(void *args) {
 }
 
 void native_prepare(JNIEnv *env, jobject obj, jstring inputStr) {
+
     in_put = env->GetStringUTFChars(inputStr, JNI_FALSE);
-    init();
+    if (!init()) {
+        return;
+    }
     fFmpegVideoPlayer = new FFmpegVideoPlayer();
     fFmpegAudioPlayer = new FFmpegAudioPlayer();
 
@@ -152,35 +170,47 @@ void native_prepare(JNIEnv *env, jobject obj, jstring inputStr) {
      * void *arg：这个参数很简单，表示的就是函数指针回调执行函数的参数
      */
     pthread_create(&p_tid, NULL, begin, NULL);
-
     env->ReleaseStringUTFChars(inputStr, in_put);
 }
 
-void init() {
+bool init() {
     LOGI_TAG("%s", "开启解码线程");
     //1 注册组件
     av_register_all();
+    //网络注册
     avformat_network_init();
 
     //封装格式上下文
     formatContext = avformat_alloc_context();
 
+    if (formatContext == NULL) {
+        LOGI_TAG("%s", "formatContext为NULL");
+        return false;
+    }
+
+    LOGI_TAG("输入视频路径::%s", in_put);
     //2 打开输入视频文件
     if (avformat_open_input(&formatContext, in_put, NULL, NULL) < 0) {
         LOGI_TAG("%s", "无法打开视频文件");
-        return;
+        return false;
+    }
+
+    AVDictionaryEntry *tag = NULL;
+    while ((tag = av_dict_get(formatContext->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) {
+
     }
 
     //3 获取视频信息
     if (avformat_find_stream_info(formatContext, NULL) < 0) {
         LOGI_TAG("%s", "获取视频信息失败");
-        return;
+        return false;
     }
 
     //获取播放总时间
     if (formatContext->duration != AV_NOPTS_VALUE) {
         duration = formatContext->duration;//毫秒
     }
+    return true;
 }
 
 void native_play(JNIEnv *env, jobject obj, jobject surface) {
@@ -189,6 +219,7 @@ void native_play(JNIEnv *env, jobject obj, jobject surface) {
         ANativeWindow_release(window);
         window = NULL;
     }
+
     window = ANativeWindow_fromSurface(env, surface);
     if (fFmpegVideoPlayer != NULL && fFmpegVideoPlayer->codec != NULL) {
         ANativeWindow_setBuffersGeometry(window, fFmpegVideoPlayer->codec->width,
@@ -201,8 +232,9 @@ jint native_getTotalTime(JNIEnv *env, jobject obj) {
     return static_cast<jint>(duration);
 }
 
+//视频的播放时间向音频的播放时间对齐；
 jdouble native_getCurPos(JNIEnv *env, jobject obj) {
-    return fFmpegVideoPlayer->clock;
+    return fFmpegAudioPlayer->clock;
 }
 
 void native_seekTo(JNIEnv *env, jobject obj, jint seekPos) {

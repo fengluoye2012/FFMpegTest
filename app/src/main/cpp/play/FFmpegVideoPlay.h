@@ -2,15 +2,15 @@
 // Created by wjw on 2019-09-09.
 //
 
+#ifndef FFMPEGTEST_FFMPEGVIDEOPLAY_H
+#define FFMPEGTEST_FFMPEGVIDEOPLAY_H
+
 extern "C" {
 #include <android/native_window.h>
 #include <libavutil/pixfmt.h>
 #include <libavformat/avformat.h>
 }
 
-
-#ifndef FFMPEGTEST_FFMPEGVIDEOPLAY_H
-#define FFMPEGTEST_FFMPEGVIDEOPLAY_H
 
 #endif //FFMPEGTEST_FFMPEGVIDEOPLAY_H
 

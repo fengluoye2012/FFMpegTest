@@ -13,7 +13,6 @@ extern "C" {
 }
 
 
-
 void *musicPlay(void *args) {
     FFmpegAudioPlayer *fFmpegAudioPlayer = (FFmpegAudioPlayer *) args;
     fFmpegAudioPlayer->createPlayer();
@@ -34,7 +33,7 @@ int getPcm(FFmpegAudioPlayer *pPlayer) {
             pPlayer->clock = av_q2d(pPlayer->time_base) * avPacket->pts;
         }
 
-        LOGI_TAG("%s", "解码");
+        LOGI_TAG("%s", "音频解码");
         if (avcodec_send_packet(pPlayer->codec, avPacket) < 0) {
             LOGI_TAG("%s", "avcodec_send_packet fail");
         }
@@ -156,6 +155,7 @@ void FFmpegAudioPlayer::setAvCodecContext(AVCodecContext *avCodecContext) {
 void FFmpegAudioPlayer::play() {
     isPause = 1;
     isPlay = 1;
+    LOGE_TAG("%s", "开启音频播放线程");
     //开启begin线程
     pthread_create(&playId, NULL, musicPlay, this);
 }

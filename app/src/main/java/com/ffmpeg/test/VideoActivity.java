@@ -1,21 +1,25 @@
 package com.ffmpeg.test;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 public class VideoActivity extends AppCompatActivity {
 
@@ -25,6 +29,9 @@ public class VideoActivity extends AppCompatActivity {
     SeekBar mSeekBar;
     boolean isSetProgress = false;
     private static final int HIDE_CONTROL_LAYOUT = -1;
+    private String TAG = VideoActivity.class.getSimpleName();
+    private boolean hasStartThread = false;
+
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
@@ -39,12 +46,13 @@ public class VideoActivity extends AppCompatActivity {
             // mSeekBar.setProgress(msg.what);
         }
     };
+    private RxPermissions rxPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
-        surfaceView = (SurfaceView) findViewById(R.id.surface);
+        surfaceView = findViewById(R.id.surface);
         davidPlayer = JNIVideoPlayer.getInstance();
         davidPlayer.setSurfaceView(surfaceView);
         mTextView = findViewById(R.id.textview);
@@ -80,17 +88,39 @@ public class VideoActivity extends AppCompatActivity {
     }
 
     public void player(View view) {
-        File file = new File(Environment.getExternalStorageDirectory(), "input.mp4");
-        davidPlayer.prepareJava(file.getAbsolutePath());
-        //"http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4"
+        if (rxPermissions == null) {
+            rxPermissions = new RxPermissions(VideoActivity.this);
+        }
+        Disposable disposable = rxPermissions
+                .request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if (aBoolean != null && aBoolean) {
+                            playerVideo();
+                        }
+                    }
+                });
+    }
+
+    private void playerVideo() {
+//        File file = new File(Environment.getExternalStorageDirectory(), "input.mp4");
+//        davidPlayer.prepareJava(file.getAbsolutePath());
+//        "http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4"
         String url = "http://dev.cdlianmeng.com/llQXenrPbCvvSiwHpr3QZtfWrKQt";
+
+//        String url = "/storage/emulated/0/DCIM/Camera/VID_20190828_174922.mp4";
         davidPlayer.prepareJava(url);
 
         // mTextView.setText(davidPlayer.getTotalTime()+"");
         if (davidPlayer.getTotalTime() != 0) {
             mTextView.setText(formatTime(davidPlayer.getTotalTime() / 1000));
             mSeekBar.setMax(davidPlayer.getTotalTime() / 1000);
-            updateSeekBar();
+
+            if (!hasStartThread) {
+                hasStartThread = true;
+                updateSeekBar();
+            }
         }
     }
 
@@ -123,7 +153,7 @@ public class VideoActivity extends AppCompatActivity {
     }
 
     //更新进度
-    public void updateSeekBar() {
+    private void updateSeekBar() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -131,6 +161,7 @@ public class VideoActivity extends AppCompatActivity {
                     try {
                         Message message = new Message();
                         message.what = (int) davidPlayer.getCurPos() * 1000;
+                        Log.i(TAG, "curPos::" + message.what);
                         handler.sendMessage(message);
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -3,8 +3,7 @@
 ////
 //
 
-#include <cstddef>
-#include "../CPlusLogUtil.h"
+
 
 #ifndef FFMPEGTEST_SINGLETONTEST_H
 #define FFMPEGTEST_SINGLETONTEST_H
@@ -14,6 +13,8 @@
 #pragma once   //防止重复加载
 static const char *kTAG = "SingletonTest";
 
+#include <cstddef>
+#include "../CPlusLogUtil.h"
 
 #endif //FFMPEGTEST_SINGLETONTEST_H
 

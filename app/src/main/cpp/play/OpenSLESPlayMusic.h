@@ -5,12 +5,12 @@
 #ifndef FFMPEGTEST_OPENSLESPLAYMUSIC_H
 #define FFMPEGTEST_OPENSLESPLAYMUSIC_H
 
-#endif //FFMPEGTEST_OPENSLESPLAYMUSIC_H
-
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 #include "iostream"
 #include "FFmpegMusic.h"
+
+#endif //FFMPEGTEST_OPENSLESPLAYMUSIC_H
 
 class OpenSLESPlayMusic {
 

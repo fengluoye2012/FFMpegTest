@@ -5,10 +5,12 @@
 #ifndef FFMPEGTEST_LOGUTIL_H
 #define FFMPEGTEST_LOGUTIL_H
 
-#endif //FFMPEGTEST_LOGUTIL_H
-
 #include "stdio.h"
 #include "string.h"
+
+#endif //FFMPEGTEST_LOGUTIL_H
+
+
 
 //日志工具头文件
 #define LOGI_TAG(...) \

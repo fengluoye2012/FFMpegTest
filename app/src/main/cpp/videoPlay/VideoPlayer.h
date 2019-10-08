@@ -1,18 +1,17 @@
 ////
 //// Created by wjw on 2019-09-09.
 ////
-//
-//
+
+
 #ifndef FFMPEGTEST_VIDEOPLAYER_H
 #define FFMPEGTEST_VIDEOPLAYER_H
-
-#endif //FFMPEGTEST_VIDEOPLAYER_H
 
 #include <jni.h>
 #include <android/log.h>
 #include "../CPlusLogUtil.h"
 #include "../Singleton/SingletonTest.h"
 
+#endif FFMPEGTEST_VIDEOPLAYER_H
 
 void native_prepare(JNIEnv *env, jobject obj, jstring inputStr);
 
@@ -33,7 +32,7 @@ void native_stop(JNIEnv *env, jobject obj);
 void native_release(JNIEnv *env, jobject obj);
 
 
-void init();
+bool init();
 
 void seekTo(jint i);
 

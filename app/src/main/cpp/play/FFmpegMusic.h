@@ -1,16 +1,16 @@
 //
 // Created by wjw on 2019-09-08.
 //
-extern "C" {
-#include <libavformat/avformat.h>
-}
+
 
 #ifndef FFMPEGTEST_FFMPEGMUSIC_H
 #define FFMPEGTEST_FFMPEGMUSIC_H
 
 //声明全局变量
 #pragma once   //防止重复加载
-
+extern "C" {
+#include <libavformat/avformat.h>
+}
 #endif //FFMPEGTEST_FFMPEGMUSIC_H
 
 
