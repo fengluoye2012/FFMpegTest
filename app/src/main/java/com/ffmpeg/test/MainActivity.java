@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 test();
             }
         });
+
         convertStr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

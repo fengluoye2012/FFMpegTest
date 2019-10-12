@@ -195,6 +195,12 @@ void FFmpegVIdeoPlay::getANativeWindow(JNIEnv *jniEnv, jobject surface) {
 }
 
 void FFmpegVIdeoPlay::playReadFrame() {
+    LOGE_TAG("srcWidth == %d，，srcHeight == %d", srcWidth,srcHeight);
+    //为什么宽为580，高为360，而视频展示宽度比较小呢，为什么这个地方狂傲按实际的设置，则显示越小呢？？？
+    //绘制之前配置nativewindow
+    ANativeWindow_setBuffersGeometry(aNativeWindow, srcWidth/2, srcHeight,
+                                     WINDOW_FORMAT_RGBA_8888);
+
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
         if (avPacket->stream_index == target_stream_index) {
 
@@ -213,10 +219,6 @@ void FFmpegVIdeoPlay::playReadFrame() {
                 }
 
                 //说明有内容
-                //绘制之前配置nativewindow
-                ANativeWindow_setBuffersGeometry(aNativeWindow, srcWidth, srcHeight,
-                                                 WINDOW_FORMAT_RGBA_8888);
-
                 //上锁
                 ANativeWindow_lock(aNativeWindow, &aNativeWindow_buffer, NULL);
 
