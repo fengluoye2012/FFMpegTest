@@ -53,10 +53,12 @@ void call_video_play(AVFrame *frame) {
     ANativeWindow_unlockAndPost(window);
 }
 
+//开始准备播放
 void *begin(void *args) {
 
     //找到视频流和音频流
     for (int i = 0; i < formatContext->nb_streams; ++i) {
+
         AVCodecParameters *avCodecParameters = formatContext->streams[i]->codecpar;
 
         //获取解码器
@@ -107,6 +109,7 @@ void *begin(void *args) {
     isPlay = 1;
 
     //解码packet，并压入队列中
+    //申请AVPacket
     packet = av_packet_alloc();
     //跳转到某一特定的帧上面播放
     int code;
@@ -160,6 +163,7 @@ void native_prepare(JNIEnv *env, jobject obj, jstring inputStr) {
     fFmpegVideoPlayer = new FFmpegVideoPlayer();
     fFmpegAudioPlayer = new FFmpegAudioPlayer();
 
+    //函数指针作为参数
     fFmpegVideoPlayer->setPlayCall(call_video_play);
 
     //创建线程，开启begin线程

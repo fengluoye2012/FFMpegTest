@@ -15,10 +15,12 @@ extern "C" {
 
 void *musicPlay(void *args) {
     FFmpegAudioPlayer *fFmpegAudioPlayer = (FFmpegAudioPlayer *) args;
+    //创建音频播放器
     fFmpegAudioPlayer->createPlayer();
     pthread_exit(0);//退出线程
 }
 
+//获取Pcm数据
 int getPcm(FFmpegAudioPlayer *pPlayer) {
     AVPacket *avPacket = av_packet_alloc();
     AVFrame *avFrame = av_frame_alloc();
@@ -215,6 +217,7 @@ void FFmpegAudioPlayer::stop() {
     LOGE_TAG("%s", "Audio clear");
 }
 
+//使用OpenSL ES创建音频播放器
 int FFmpegAudioPlayer::createPlayer() {
     LOGI_TAG("%s", "创建OpenSL ES 播放器");
 
@@ -320,6 +323,7 @@ void FFmpegAudioPlayer::createFFmpeg(FFmpegAudioPlayer *pPlayer) {
     swr_alloc_set_opts(pPlayer->swrContext, out_ch_layout, out_formart, out_sample_rate,
                        pPlayer->codec->channel_layout, pPlayer->codec->sample_fmt,
                        pPlayer->codec->sample_rate, 0, NULL);
+
     swr_init(pPlayer->swrContext);
     //获取通道数 2
     pPlayer->out_channer_nb = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
