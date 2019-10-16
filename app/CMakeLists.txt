@@ -25,6 +25,7 @@ file(GLOB native_srcs_singleton "${CMAKE_SOURCE_DIR}/src/main/cpp/Singleton/*.cp
 file(GLOB native_srcs_play "${CMAKE_SOURCE_DIR}/src/main/cpp/play/*.cpp")
 file(GLOB native_srcs_videoPlay "${CMAKE_SOURCE_DIR}/src/main/cpp/videoPlay/*.cpp")
 file(GLOB ffmpeg_srcs "${CMAKE_SOURCE_DIR}/src/main/cpp/*.c")
+file(GLOB ffmpeg_log "${CMAKE_SOURCE_DIR}/src/main/cpp/log/*.c")
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -48,6 +49,7 @@ add_library(
 
         SHARED
 
+        ${ffmpeg_log}
         ${native_srcs_dy}
         ${native_srcs_singleton}
         ${native_srcs_play}

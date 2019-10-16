@@ -262,6 +262,7 @@ void FFmpegVideoPlayer::setFFmpegMusic(FFmpegAudioPlayer *fFmpegAudioPlayer) {
     this->fFmpegAudioPlayer = fFmpegAudioPlayer;
 }
 
+//函数指针作为参数  void (*call)(AVFrame *) 从左到右  返回值 变量 参数
 void FFmpegVideoPlayer::setPlayCall(void (*call)(AVFrame *)) {
     video_call = call;
 }
