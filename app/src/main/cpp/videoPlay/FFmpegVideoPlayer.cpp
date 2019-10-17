@@ -36,6 +36,7 @@ void *videoPlay(void *args) {
                          width, height, 1);
 
     LOGE_TAG("%s", "转换成rgba格式");
+    //flag：SWS_BICUBIC 这个参数左尺寸缩放；
     fFmpegVideoPlayer->swsContext = sws_getContext(width, height, fFmpegVideoPlayer->codec->pix_fmt,
                                                    width, height, AV_PIX_FMT_RGBA, SWS_BICUBIC,
                                                    NULL, NULL, NULL);

@@ -23,6 +23,7 @@ void *musicPlay(void *args) {
 //获取Pcm数据
 int getPcm(FFmpegAudioPlayer *pPlayer) {
     AVPacket *avPacket = av_packet_alloc();
+    //AVFrame存储的就是独立的一帧图像
     AVFrame *avFrame = av_frame_alloc();
 
     int size = 0;
@@ -35,7 +36,12 @@ int getPcm(FFmpegAudioPlayer *pPlayer) {
             pPlayer->clock = av_q2d(pPlayer->time_base) * avPacket->pts;
         }
 
+        //为什么采用avcodec_send_packet()、avcodec_receive_frame()方法解码？？
+        //avcodec_send_packet()将一个packet写入缓存空间；
+        //avcodec_receive_frame()从缓存空间将取出avFrame；
+        //发送一个，接受可能多个；
         LOGI_TAG("%s", "音频解码");
+        //发送到线程解码
         if (avcodec_send_packet(pPlayer->codec, avPacket) < 0) {
             LOGI_TAG("%s", "avcodec_send_packet fail");
         }
