@@ -81,16 +81,18 @@ bool FFmpegVIdeoPlay::getStreamInfo(const char *input) {
 
 bool FFmpegVIdeoPlay::getVideoIndex() {
 
+    //使用av_find_best_stream()找到对应的流Index,替换遍历的方法
+    target_stream_index = av_find_best_stream(avFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
+
     //获取视频流的索引位置
     //遍历所有类型的流（音频流、视频流、字幕流），找到视频流
-
-    for (int i = 0; i < avFormatContext->nb_streams; i++) {
-        //流的类型  为视频流;//AVMEDIA_TYPE_AUDIO 为音频流；
-        if (avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            target_stream_index = i;
-            break;
-        }
-    }
+//    for (int i = 0; i < avFormatContext->nb_streams; i++) {
+//        //流的类型  为视频流;//AVMEDIA_TYPE_AUDIO 为音频流；
+//        if (avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+//            target_stream_index = i;
+//            break;
+//        }
+//    }
 
     if (target_stream_index == -1) {
         LOGI_TAG("%s", "找不到视频流");
@@ -119,6 +121,9 @@ bool FFmpegVIdeoPlay::getAVCodec() {
     avCodecContext = avcodec_alloc_context3(avCodec);
 
     code = avcodec_parameters_to_context(avCodecContext, avCodecParameters);
+
+    //指定多线程解码，提高解码速度
+    avCodecContext->thread_count = 4;
     if (code < 0) {
         LOGI_TAG("%s", "avcodec_parameters_to_context Fail");
         return false;
@@ -184,6 +189,8 @@ void FFmpegVIdeoPlay::prepareReadFrame(enum AVPixelFormat aVPixelFormat) {
     sws_ctx = sws_getContext(srcWidth, srcHeight, avCodecContext->pix_fmt,
                              srcWidth, srcHeight, aVPixelFormat, SWS_BICUBIC,
                              NULL, NULL, NULL);
+
+    //也可以考虑使用 sws_getCachedContext()
 }
 
 void FFmpegVIdeoPlay::getANativeWindow(JNIEnv *jniEnv, jobject surface) {
@@ -195,16 +202,19 @@ void FFmpegVIdeoPlay::getANativeWindow(JNIEnv *jniEnv, jobject surface) {
 }
 
 void FFmpegVIdeoPlay::playReadFrame() {
-    LOGE_TAG("srcWidth == %d，，srcHeight == %d", srcWidth,srcHeight);
+    LOGE_TAG("srcWidth == %d，，srcHeight == %d", srcWidth, srcHeight);
     //为什么宽为580，高为360，而视频展示宽度比较小呢，为什么这个地方狂傲按实际的设置，则显示越小呢？？？
     //绘制之前配置nativewindow
-    ANativeWindow_setBuffersGeometry(aNativeWindow, srcWidth/2, srcHeight,
+    ANativeWindow_setBuffersGeometry(aNativeWindow, srcWidth, srcHeight,
                                      WINDOW_FORMAT_RGBA_8888);
 
     while (av_read_frame(avFormatContext, avPacket) >= 0) {
         if (avPacket->stream_index == target_stream_index) {
 
-           // LOGI_TAG("%s", "解码");
+            //avcodec_send_packet 将avPacket不断的发送到缓存空间；
+            //avcodec_receive_frame 不断的从缓存空间取出AVFrame
+            //但是每次发送一个avPacket，但是取出来的可能是多个，所以要添加循环；
+            // LOGI_TAG("%s", "解码");
             avcodec_send_packet(avCodecContext, avPacket);
 
             if (code < 0) {
@@ -223,8 +233,11 @@ void FFmpegVIdeoPlay::playReadFrame() {
                 ANativeWindow_lock(aNativeWindow, &aNativeWindow_buffer, NULL);
 
                 //转换为rgb格式
-                sws_scale(sws_ctx, (const uint8_t *const *) avFrame->data, avFrame->linesize, 0,
-                          avFrame->height, avFrameYUV->data, avFrameYUV->linesize);
+                int h = sws_scale(sws_ctx, (const uint8_t *const *) avFrame->data,
+                                  avFrame->linesize, 0,
+                                  avFrame->height, avFrameYUV->data, avFrameYUV->linesize);
+
+                LOGI_TAG("h == %d",h);
 
                 // rgb_frame是有画面数据
                 uint8_t *dst = (uint8_t *) aNativeWindow_buffer.bits;

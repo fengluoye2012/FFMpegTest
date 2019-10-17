@@ -29,12 +29,15 @@ void FFmpegMusic::createFFmpeg(const char *input, int *rate, int *channel) {
         return;
     }
 
-    for (int i = 0; i < avFormatContext->nb_streams; ++i) {
-        if (avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-            audio_stream_index = i;
-            break;
-        }
-    }
+    //使用av_find_best_stream()找到对应的流Index,替换遍历的方法
+    audio_stream_index  =  av_find_best_stream(avFormatContext,AVMEDIA_TYPE_VIDEO,-1,-1,NULL,0);
+
+//    for (int i = 0; i < avFormatContext->nb_streams; ++i) {
+//        if (avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+//            audio_stream_index = i;
+//            break;
+//        }
+//    }
 
     if (audio_stream_index < 0) {
         LOGI_TAG("%s", "无法获取音频流下标");
@@ -101,6 +104,7 @@ int FFmpegMusic::getPcm(void **pcm, size_t *pcm_size) {
                     LOGI_TAG("%s", "avcodec_receive_packet Fail");
                     break;
                 }
+                //音频重采样
                 swr_convert(swrContext, &out_buffer, 44100 * 2,
                             (const uint8_t **) avFrame->data, avFrame->nb_samples);
 

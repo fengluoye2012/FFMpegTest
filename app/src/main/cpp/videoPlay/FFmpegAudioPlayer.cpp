@@ -316,6 +316,7 @@ int FFmpegAudioPlayer::createPlayer() {
 //初始化FFmpeg
 void FFmpegAudioPlayer::createFFmpeg(FFmpegAudioPlayer *pPlayer) {
     LOGI_TAG("%s", "初始化ffmpeg");
+
     pPlayer->swrContext = swr_alloc();
 
     pPlayer->out_buffer = (uint8_t *) av_malloc(44100 * 2);
