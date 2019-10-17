@@ -56,18 +56,32 @@ void call_video_play(AVFrame *frame) {
 //开始准备播放
 void *begin(void *args) {
 
-    //找到视频流和音频流
+    //可以使用 av_find_best_stream()的方式替换下列方式，找到对应的音频流、视频流索引；
+    int videoStream = av_find_best_stream(formatContext, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
+    int audioStream = av_find_best_stream(formatContext, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
+
+    //打开视频解码器
+    AVCodecParameters *avCodecParameters = formatContext->streams[videoStream]->codecpar;
+
+    //打开音频解码器
+
+
+    //找到视频流和音频流，并且打开音频、视频解码器
     for (int i = 0; i < formatContext->nb_streams; ++i) {
 
         AVCodecParameters *avCodecParameters = formatContext->streams[i]->codecpar;
 
         //获取解码器
         AVCodec *avCodec = avcodec_find_decoder(avCodecParameters->codec_id);
+        //avcodec_find_decoder_by_name() //也可以通过该方法获取解码器；
 
         AVCodecContext *avCodecContext = avcodec_alloc_context3(avCodec);
         //关联参数
         avcodec_parameters_to_context(avCodecContext, avCodecParameters);
+        //设置线程数
+        avCodecContext->thread_count = 1;
 
+        //打开解码器
         if (avcodec_open2(avCodecContext, avCodec, NULL) < 0) {
             LOGI_TAG("%s", "打开失败");
             continue;
@@ -92,10 +106,8 @@ void *begin(void *args) {
                                                  avCodecParameters->height,
                                                  WINDOW_FORMAT_RGBA_8888);
             }
-        }
-
-        //音频流
-        if (avCodecParameters->codec_type == AVMEDIA_TYPE_AUDIO) {
+            //音频流
+        } else if (avCodecParameters->codec_type == AVMEDIA_TYPE_AUDIO) {
             fFmpegAudioPlayer->index = i;
             fFmpegAudioPlayer->setAvCodecContext(avCodecContext);
             fFmpegAudioPlayer->time_base = formatContext->streams[i]->time_base;
@@ -109,11 +121,13 @@ void *begin(void *args) {
     isPlay = 1;
 
     //解码packet，并压入队列中
-    //申请AVPacket
+    //创建并且初始化；AVPacket结构体存储压缩数据；
     packet = av_packet_alloc();
     //跳转到某一特定的帧上面播放
     int code;
     while (isPlay) {
+        //无法判断是到文件结尾还是都是错误，因为到文件结尾也是返回0；
+        //对于视频，数据包只包含一帧。对于音频，如果每个帧有一个已知的固定大小(例如PCM或ADPCM数据)，则它包含整数帧。如果音频帧有一个可变的大小(如MPEG音频)，那么它包含一个帧。
         code = av_read_frame(formatContext, packet);
         if (code == 0) {
             if (fFmpegVideoPlayer != NULL && fFmpegVideoPlayer->isPlay &&
@@ -124,6 +138,8 @@ void *begin(void *args) {
                        packet->stream_index == fFmpegAudioPlayer->index) {
                 fFmpegAudioPlayer->put(packet);
             }
+
+            //packet使用完之后，释放掉；
             av_packet_unref(packet);
         } else if (code == AVERROR_EOF) {
             //读取完毕，但不一定是播放完毕
@@ -184,7 +200,7 @@ bool init() {
     //网络注册
     avformat_network_init();
 
-    //封装格式上下文
+    //封装格式上下文，分配一个AVFormatContext，使用avformat_free_context()释放context,同时释放其内部分配的所有内容；
     formatContext = avformat_alloc_context();
 
     if (formatContext == NULL) {
@@ -193,7 +209,7 @@ bool init() {
     }
 
     LOGI_TAG("输入视频路径::%s", in_put);
-    //2 打开输入视频文件
+    //2 打开输入视频文件，可以将AVFormatContext传入NULL指针，其内部会分配一个AVFormatContext，并为其赋值；如果想要使用自定义IO，可以预申请；
     if (avformat_open_input(&formatContext, in_put, NULL, NULL) < 0) {
         LOGI_TAG("%s", "无法打开视频文件");
         return false;
@@ -204,7 +220,7 @@ bool init() {
 
     }
 
-    //3 获取视频信息
+    //3 获取视频信息，该方法不能保证可以打开所有编解码器；
     if (avformat_find_stream_info(formatContext, NULL) < 0) {
         LOGI_TAG("%s", "获取视频信息失败");
         return false;
@@ -242,7 +258,7 @@ jdouble native_getCurPos(JNIEnv *env, jobject obj) {
 }
 
 void native_seekTo(JNIEnv *env, jobject obj, jint seekPos) {
-    seekTo(seekPos / 1000);
+    seekTo(seekPos);
 }
 
 void seekTo(int mesc) {
@@ -253,12 +269,21 @@ void seekTo(int mesc) {
     fFmpegAudioPlayer->queue.clear();
     fFmpegAudioPlayer->queue.clear();
 
-    //跳到某个关键帧
-    av_seek_frame(formatContext, fFmpegVideoPlayer->index,
-                  (int64_t) (mesc / av_q2d(fFmpegVideoPlayer->time_base)), AVSEEK_FLAG_BACKWARD);
+    //av_seek_frame()的问题：1）选择视频还是音频来选择seek()，选择视频帧来移动；
+    // 2）时间点附近关键帧往前，还是往后找（前后以当前时间点的前后）；一半是往前找，找关键帧 AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME
 
-    av_seek_frame(formatContext, fFmpegAudioPlayer->index,
-                  (int64_t) (mesc / av_q2d(fFmpegAudioPlayer->time_base)), AVSEEK_FLAG_BACKWARD);
+    LOGI_TAG("mesc == %d,,av_q2d == %d", fFmpegVideoPlayer->time_base.num,
+             fFmpegVideoPlayer->time_base.den);
+
+    LOGI_TAG("mesc == %d,,av_q2d == %f,,,timestamp == %f", mesc,
+             av_q2d(fFmpegVideoPlayer->time_base), mesc / av_q2d(fFmpegVideoPlayer->time_base));
+    //跳到某个关键帧，在时间戳中找关键帧；
+    av_seek_frame(formatContext, fFmpegVideoPlayer->index,
+                  (int64_t) (mesc / av_q2d(fFmpegVideoPlayer->time_base)),
+                  AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_FRAME);
+
+//    av_seek_frame(formatContext, fFmpegAudioPlayer->index,
+//                  (int64_t) (mesc / av_q2d(fFmpegAudioPlayer->time_base)), AVSEEK_FLAG_BACKWARD);
 }
 
 void native_stepUp(JNIEnv *env, jobject obj) {
