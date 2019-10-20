@@ -326,9 +326,9 @@ void native_singleton(JNIEnv *env, jobject jobj) {
 
 }
 
-void native_shader_video_play(JNIEnv *env, jobject jobj, jstring inPath,jobject surface) {
+void native_shader_video_play(JNIEnv *env, jobject jobj, jstring inPath, jobject surface) {
     ShaderVideoPlay *shaderVideoPlay = new ShaderVideoPlay();
-    shaderVideoPlay->shader_play_video(env,inPath,surface);
+    shaderVideoPlay->shader_play_video(env, inPath, surface);
 }
 
 
@@ -351,7 +351,8 @@ static JNINativeMethod gMethods[] = {
         {"singleton",                   "()V",                                         (void *) native_singleton},
         {"playAudio",                   "(Ljava/lang/String;)V",                       (void *) native_ffmpeg_play_audio},
         {"playAudioOpenSL",             "(Ljava/lang/String;)V",                       (void *) native_ffmpeg_play_audio_openSL},
-        {"stopAuidoOpenSL",             "()V",                                         (void *) native_ffmpeg_stop_audio_openSL}
+        {"stopAuidoOpenSL",             "()V",                                         (void *) native_ffmpeg_stop_audio_openSL},
+        {"open_shader",                 "(Ljava/lang/String;Landroid/view/Surface;)V", (void *) native_shader_video_play}
 };
 
 int registerNatives(JNIEnv *env) {

@@ -21,7 +21,6 @@ public class ShaderVideo extends GLSurfaceView implements Runnable, SurfaceHolde
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        super.surfaceCreated(holder);
         new Thread(this).start();
     }
 

@@ -37,3 +37,6 @@ void native_mp4ToM3U8(JNIEnv *env, jobject jobj, jstring inPath, jstring outPath
 
 void native_singleton(JNIEnv *env, jobject jobj);
 
+
+void native_shader_video_play(JNIEnv *env, jobject jobj, jstring inPath,jobject surface);
+

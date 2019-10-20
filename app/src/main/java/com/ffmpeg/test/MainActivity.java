@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private Activity act;
     private RxPermissions rxPermissions;
     private TextView tvPlayVideo;
+    private TextView tvPlayVideoShader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,15 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.sample_text);
         convertStr = findViewById(R.id.convert_str);
         tvPlayVideo = findViewById(R.id.tv_play_video);
+        tvPlayVideo = findViewById(R.id.tv_play_video);
+        tvPlayVideoShader = findViewById(R.id.tv_play_video_shader);
+
+        initListener();
+        jniFormCPlus();
+        jniFormC();
+    }
+
+    private void initListener() {
 
 
         textView.setOnClickListener(new View.OnClickListener() {
@@ -54,12 +64,16 @@ public class MainActivity extends AppCompatActivity {
         tvPlayVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(act,VideoPlayActivity.class));
+                startActivity(new Intent(act, VideoPlayActivity.class));
             }
         });
 
-        jniFormCPlus();
-        jniFormC();
+        tvPlayVideoShader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(act, ShaderVideoActivity.class));
+            }
+        });
     }
 
     private void goVideoPlayActivity() {

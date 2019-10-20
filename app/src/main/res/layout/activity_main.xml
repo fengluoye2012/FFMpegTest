@@ -30,5 +30,12 @@
         android:gravity="center"
         android:text="播放视频" />
 
+    <TextView
+        android:id="@+id/tv_play_video_shader"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="使用Shader播放视频" />
+
 
 </LinearLayout>
