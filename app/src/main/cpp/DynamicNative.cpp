@@ -18,6 +18,7 @@
 #include "CPlusLogUtil.h"
 #include "play/OpenSLESPlayMusic.h"
 #include "videoPlay/VideoPlayer.h"
+#include "play/ShaderVideoPlay.h"
 
 //引用C的头文件
 extern "C" {
@@ -323,6 +324,11 @@ void native_singleton(JNIEnv *env, jobject jobj) {
         LOGE_TAG("%s", "创建了多个实例对象");
     }
 
+}
+
+void native_shader_video_play(JNIEnv *env, jobject jobj, jstring inPath,jobject surface) {
+    ShaderVideoPlay *shaderVideoPlay = new ShaderVideoPlay();
+    shaderVideoPlay->shader_play_video(env,inPath,surface);
 }
 
 

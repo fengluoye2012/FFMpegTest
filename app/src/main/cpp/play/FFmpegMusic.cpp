@@ -30,7 +30,7 @@ void FFmpegMusic::createFFmpeg(const char *input, int *rate, int *channel) {
     }
 
     //使用av_find_best_stream()找到对应的流Index,替换遍历的方法
-    audio_stream_index  =  av_find_best_stream(avFormatContext,AVMEDIA_TYPE_VIDEO,-1,-1,NULL,0);
+    audio_stream_index = av_find_best_stream(avFormatContext, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
 
 //    for (int i = 0; i < avFormatContext->nb_streams; ++i) {
 //        if (avFormatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
@@ -68,16 +68,19 @@ void FFmpegMusic::createFFmpeg(const char *input, int *rate, int *channel) {
     avPacket = av_packet_alloc();
     avFrame = av_frame_alloc();
 
+    //音频重采样上下文；
     swrContext = swr_alloc();
 
     out_buffer = (uint8_t *) av_malloc(44100 * 2);
     uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;
+
     enum AVSampleFormat out_format = AV_SAMPLE_FMT_S16;
     int out_sample_rate = avCodecContext->sample_rate;
 
-    swr_alloc_set_opts(swrContext, out_ch_layout, out_format, out_sample_rate,
-                       avCodecContext->channel_layout, avCodecContext->sample_fmt,
-                       avCodecContext->sample_rate, 0, NULL);
+    //
+    swrContext = swr_alloc_set_opts(swrContext, out_ch_layout, out_format, out_sample_rate,
+                                    avCodecContext->channel_layout, avCodecContext->sample_fmt,
+                                    avCodecContext->sample_rate, 0, NULL);
 
     swr_init(swrContext);
 
@@ -105,8 +108,8 @@ int FFmpegMusic::getPcm(void **pcm, size_t *pcm_size) {
                     break;
                 }
                 //音频重采样
-                swr_convert(swrContext, &out_buffer, 44100 * 2,
-                            (const uint8_t **) avFrame->data, avFrame->nb_samples);
+                int len = swr_convert(swrContext, &out_buffer, 44100 * 2,
+                                      (const uint8_t **) avFrame->data, avFrame->nb_samples);
 
                 //缓冲区大小
                 int size = av_samples_get_buffer_size(NULL, out_channel_nb, avFrame->nb_samples,
@@ -116,11 +119,8 @@ int FFmpegMusic::getPcm(void **pcm, size_t *pcm_size) {
                 *pcm_size = static_cast<size_t>(size);
                 break;
             }
-
         }
-
     }
-
     return 0;
 }
 

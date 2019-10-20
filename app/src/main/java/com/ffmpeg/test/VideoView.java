@@ -2,15 +2,15 @@ package com.ffmpeg.test;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 /**
- * 问题：
- * 1：为什么视频高度和SurfaceView高度一致，而宽度不对？？？
+ * 或者继承GLSurfaceView、SurfaceView
  */
-public class VideoView extends SurfaceView implements SurfaceHolder.Callback {
+public class VideoView extends GLSurfaceView implements SurfaceHolder.Callback,Runnable {
 
     private SurfaceHolder holder;
 
@@ -19,31 +19,18 @@ public class VideoView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public VideoView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        super(context, attrs);
     }
 
-    public VideoView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-
-        holder = getHolder();
-        holder.setFormat(PixelFormat.RGBA_8888);
-
+    @Override
+    public void run() {
+        String networkUrl = "http://dev.cdlianmeng.com/llQXenrPbCvvSiwHpr3QZtfWrKQt";
+        JNIDynamicUtils.getInstance().playVideo(networkUrl, getHolder().getSurface());
     }
-
-
-    public void play(final String input) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                JNIDynamicUtils.getInstance().playVideo(input, holder.getSurface());
-            }
-        }).start();
-    }
-
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
+        new Thread(this).start();
     }
 
     @Override
@@ -55,4 +42,5 @@ public class VideoView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder holder) {
 
     }
+
 }

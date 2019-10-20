@@ -144,6 +144,10 @@ target_link_libraries( # Specifies the target library.
         swresample
         swscale
 
+        # shader渲染视频
+        EGL
+        GLESv2
         android
+
         ${OpenSLES-lib}
         ${log-lib})

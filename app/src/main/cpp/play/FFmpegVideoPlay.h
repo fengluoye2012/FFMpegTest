@@ -25,15 +25,14 @@ public:
     AVCodecContext *avCodecContext;
     AVCodec *avCodec;
 
-    int srcWidth, srcHeight;
+    int srcWidth, srcHeight,outWidth,outHeight;
     AVPacket *avPacket;
     AVFrame *avFrame;
-    AVFrame *avFrameYUV;
-    uint8_t *out_buffer;
+//    AVFrame *avFrameYUV;
+//    uint8_t *out_buffer;
     struct SwsContext *sws_ctx;
     ANativeWindow *aNativeWindow;
-    //视频缓冲区
-    ANativeWindow_Buffer aNativeWindow_buffer;
+
 
     void videoPlay(JNIEnv *jniEnv, const char *input, jobject surface);
 

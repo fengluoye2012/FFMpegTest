@@ -35,20 +35,32 @@ void OpenSLESPlayMusic::playMusic(const char *input) {
 
 //创建引擎
 void OpenSLESPlayMusic::createEngine() {
+
+    SLresult sLresult;
     //创建引擎
-    slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
-    //实现engineObject接口对象
-    (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
+    sLresult = slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
+    if (sLresult != SL_RESULT_SUCCESS) {
+        return;
+    }
+    //实例化，第二个参数传false 阻塞；
+    sLresult = (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
+
+    if (sLresult != SL_RESULT_SUCCESS) {
+        return;
+    }
+
     //通过引擎调用接口初始化SLEngineItf
     (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineEngine);
+
 }
 
 //创建混音器
 void OpenSLESPlayMusic::createMixVolume() {
-    //用引擎对象创建混音器接口对象
+    //创建输出设备
     (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 0, 0, 0);
-    //实现混音器接口对象
+    //实例化对象
     (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
+    //
     SLresult sLresult = (*outputMixObject)->GetInterface(outputMixObject,
                                                          SL_IID_ENVIRONMENTALREVERB,
                                                          &outputMixEnvironmentalReverb);
@@ -69,6 +81,11 @@ void OpenSLESPlayMusic::createPlayer(const char *input) {
 
     LOGI_TAG("rate::%d,,channels::%d", rate, channels);
 
+    //存放输出类型指定
+    SLDataLocator_OutputMix slDataLocator_outputMix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
+    SLDataSink slDataSink = {&slDataLocator_outputMix, NULL};
+
+    //配置音频信息
     /*
      * typedef struct SLDataLocator_AndroidBufferQueue_ {
     SLuint32    locatorType;//缓冲区队列类型
@@ -84,7 +101,7 @@ void OpenSLESPlayMusic::createPlayer(const char *input) {
         SLuint32 		bitsPerSample;  采样位数
         SLuint32 		containerSize;  包含位数
         SLuint32 		channelMask;     立体声
-        SLuint32		endianness;    end标志位
+        SLuint32		endianness;    字节序
     } SLDataFormat_PCM;
      */
     SLDataFormat_PCM pcm = {
@@ -101,27 +118,26 @@ void OpenSLESPlayMusic::createPlayer(const char *input) {
      */
     SLDataSource dataSource = {&android_queue, &pcm};
 
-    SLDataLocator_OutputMix slDataLocator_outputMix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
-
-    SLDataSink slDataSink = {&slDataLocator_outputMix, NULL};
-
     const SLInterfaceID ids[3] = {SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND, SL_IID_VOLUME};
     const SLboolean req[3] = {SL_BOOLEAN_FALSE, SL_BOOLEAN_FALSE, SL_BOOLEAN_FALSE};
     LOGI_TAG("%s", "执行到此处");
 
-    (*engineEngine)->CreateAudioPlayer(engineEngine, &audioPlayer, &dataSource, &slDataSink, 3, ids,
-                                       req);
+    //创建播放器
+    (*engineEngine)->CreateAudioPlayer(engineEngine, &audioPlayer, &dataSource, &slDataSink,
+                                       sizeof(ids) / sizeof(req), ids, req);
+    //事例化
     (*audioPlayer)->Realize(audioPlayer, SL_BOOLEAN_FALSE);
     LOGI_TAG("%s", "执行到此处2");
-
-    //初始化播放器
+    //获取接口
     (*audioPlayer)->GetInterface(audioPlayer, SL_IID_PLAY, &slPlayItf);
+
     //注册缓冲区，通过缓冲区里面的数据进行播放
     (*audioPlayer)->GetInterface(audioPlayer, SL_IID_BUFFERQUEUE, &slBufferQueueItf);
+
     //设置回调接口
     (*slBufferQueueItf)->RegisterCallback(slBufferQueueItf, getQueueCallBack, NULL);
 
-    //播放
+    //设置播放状态
     (*slPlayItf)->SetPlayState(slPlayItf, SL_PLAYSTATE_PLAYING);
     //开始播放
     getQueueCallBack(slBufferQueueItf, NULL);

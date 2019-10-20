@@ -21,9 +21,9 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = MainActivity.class.getSimpleName();
     private TextView textView;
     private TextView convertStr;
-    private VideoView videoView;
     private Activity act;
     private RxPermissions rxPermissions;
+    private TextView tvPlayVideo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         // Example of a call to a native method
         textView = findViewById(R.id.sample_text);
         convertStr = findViewById(R.id.convert_str);
-        videoView = findViewById(R.id.videoView);
+        tvPlayVideo = findViewById(R.id.tv_play_video);
 
 
         textView.setOnClickListener(new View.OnClickListener() {
@@ -48,6 +48,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 goVideoPlayActivity();
+            }
+        });
+
+        tvPlayVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(act,VideoPlayActivity.class));
             }
         });
 
@@ -77,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
                             //FFmpegTest.videoDecode(inPath, outPath);
                             //JNIDynamicUtils.getInstance().videoDecode(inPath, outPath);
-                            videoView.play(networkUrl);
+                            //videoView.play(networkUrl);
 
                             //JNIDynamicUtils.getInstance().mp4ToFlv(inPath, outFlvPath);
                             //JNIDynamicUtils.getInstance().singleton();

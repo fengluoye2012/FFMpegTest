@@ -23,9 +23,12 @@
         android:padding="5dp"
         android:text="Hello World!" />
 
-    <com.ffmpeg.test.VideoView
-        android:id="@+id/videoView"
-        android:layout_width="580dp"
-        android:layout_height="360dp" />
+    <TextView
+        android:id="@+id/tv_play_video"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="播放视频" />
+
 
 </LinearLayout>

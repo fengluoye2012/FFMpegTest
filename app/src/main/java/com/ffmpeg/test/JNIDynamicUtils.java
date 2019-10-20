@@ -91,5 +91,7 @@ public class JNIDynamicUtils {
             audioTrack.write(buffer, 0, length);
         }
     }
+
+    public native void open_shader(String  urlPath,Surface surface);
 }
 

@@ -77,6 +77,16 @@ https://blog.csdn.net/yingyemin/article/details/76570576
 
 int64_t 是long long 类型；
 
+5)NDK-stack的使用
+https://www.cnblogs.com/quansir/p/4286432.html
+
+6）OpenGL ES 直接绘制yuv
+需要掌握EGL、OpenglEs、shader
+1、EGL: OpenG 与窗口系通对应的适配层；1.1）DisPlay与原生窗口链接；1.2）Surface配置和创建surface(窗口和屏幕上的渲染区域)；
+1.3）Context 创建渲染环境（Context 上下文），渲染环境指OpenGL ES的所有项目运行需要的数据结构。如：顶点、片元着色器、顶点数据矩阵；
+
+
+
 三、C、C++的区别
 1）C没有类的概念，也就没有public等访问修饰符，也没有继承等；C不允许使用默认参数，不定长度参数前必须有正常参数，
 2）全局变量，静态变量，变量的区别和使用
