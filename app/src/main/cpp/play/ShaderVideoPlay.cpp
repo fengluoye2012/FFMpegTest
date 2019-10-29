@@ -18,7 +18,7 @@ void ShaderVideoPlay::shader_play_video(JNIEnv *env, jstring inPath, jobject sur
     FILE *fp = fopen(in_path, "rb");
 
     if (!fp) {
-        LOGI_TAG("open file %s failed", %in_path);
+        LOGI_TAG("open file %s failed", in_path);
         return;
     }
 
@@ -133,6 +133,7 @@ void ShaderVideoPlay::shader_play_video(JNIEnv *env, jstring inPath, jobject sur
     int width = 424;
     int height = 240;
 
+    LOGI_TAG("%s", "材质纹理初始化");
     //材质纹理初始化
     //设置纹理层
     glUniform1i(glGetUniformLocation(program, "yTexture"), 0);//对于纹理第一层
@@ -208,6 +209,7 @@ void ShaderVideoPlay::shader_play_video(JNIEnv *env, jstring inPath, jobject sur
     size_t size = static_cast<size_t>(width * height);
     for (int i = 0; i < 10000; i++) {
         if (feof(fp) == 0) {
+            //LOGI_TAG("%s", "feof(fp)  success");
             fread(buf[0], 1, size, fp);
             fread(buf[1], 1, size / 4, fp);
             fread(buf[2], 1, size / 4, fp);
@@ -235,11 +237,11 @@ void ShaderVideoPlay::shader_play_video(JNIEnv *env, jstring inPath, jobject sur
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width / 2, height / 2, GL_LUMINANCE, GL_UNSIGNED_BYTE,
                     buf[2]);
 
+    LOGI_TAG("%s", "材质纹理初始化");
     //三维绘制
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     //窗口显示
     eglSwapBuffers(display, eglSurface);
-
 
     //释放字符串
     env->ReleaseStringUTFChars(inPath, in_path);

@@ -16,7 +16,8 @@ public class ShaderVideo extends GLSurfaceView implements Runnable, SurfaceHolde
 
     @Override
     public void run() {
-        JNIDynamicUtils.getInstance().open_shader("", getHolder().getSurface());
+        String path = "/sdcard/test.yuv";
+        JNIDynamicUtils.getInstance().open_shader(path, getHolder().getSurface());
     }
 
     @Override
@@ -24,4 +25,12 @@ public class ShaderVideo extends GLSurfaceView implements Runnable, SurfaceHolde
         new Thread(this).start();
     }
 
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+    }
 }

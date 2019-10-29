@@ -96,7 +96,8 @@ public class MainActivity extends AppCompatActivity {
 
                             String networkUrl = "http://dev.cdlianmeng.com/llQXenrPbCvvSiwHpr3QZtfWrKQt";
 
-                            //FFmpegTest.videoDecode(inPath, outPath);
+                            FFmpegTest.videoDecode(inPath, outPath);
+
                             //JNIDynamicUtils.getInstance().videoDecode(inPath, outPath);
                             //videoView.play(networkUrl);
 
